@@ -1,0 +1,18 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="yuan.flood.dao.Entity">
+    <class name="Sensor" table="fsensor">
+        <id name="sensorID" type="java.lang.String" column="id">
+            <generator class="assigned">
+            </generator>
+        </id>
+        <property name="sensorName" type="java.lang.String" column="sensorName"></property>
+        <property name="lat" type="java.lang.Double" column="latitude"></property>
+        <property name="lon" type="java.lang.Double" column="lontitude"></property>
+        <set name="observedProperties" inverse="false" cascade="save-update" table="sensor_obs" lazy="false">
+            <key column="sensor_id"></key>
+            <many-to-many class="ObservedProperty" column="obs_id"/>
+        </set>
+    </class>
+</hibernate-mapping>

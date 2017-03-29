@@ -1,0 +1,58 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="yuan.flood.dao.Entity">
+    <class name="SubscibeEventParams" table="fevent">
+        <id name="eventID" type="java.lang.String" column="id">
+            <generator class="assigned">
+            </generator>
+        </id>
+        <property name="eventName" type="java.lang.String" column="eventName"></property>
+        <property name="order" type="java.lang.Long" column="forder"></property>
+        <property name="eventSesID" type="java.lang.String" column="eventSesID"></property>
+
+        <property name="diagnosisSensor" type="java.lang.String" column="diagnosisSensor"></property>
+        <property name="diagnosisObservation" type="java.lang.String" column="diagnosisObservation"></property>
+        <property name="diagnosisDay" type="java.lang.Integer" column="diagnosisDay"></property>
+        <property name="diagnosisHour" type="java.lang.Integer" column="diagnosisHour"></property>
+        <property name="diagnosisMinute" type="java.lang.Integer" column="diagnosisMinute"></property>
+        <property name="diagnosisSecond" type="java.lang.Integer" column="diagnosisSecond"></property>
+        <property name="diagnosisRepeatTimes" type="java.lang.Integer" column="diagnosisRepeatTimes"></property>
+        <property name="diagnosisThreshold" type="java.lang.Double" column="diagnosisThreshold"></property>
+        <property name="diagnosisUnit" type="java.lang.String" column="diagnosisUnit"></property>
+
+        <property name="prepareSensor" type="java.lang.String" column="prepareSensor"></property>
+        <property name="prepareObservation" type="java.lang.String" column="prepareObservation"></property>
+        <property name="prepareThreshold" type="java.lang.Double" column="prepareThreshold"></property>
+        <property name="prepareUnit" type="java.lang.String" column="prepareUnit"></property>
+        <property name="prepareDay" type="java.lang.Integer" column="prepareDay"></property>
+        <property name="prepareHour" type="java.lang.Integer" column="prepareHour"></property>
+        <property name="prepareMinute" type="java.lang.Integer" column="prepareMinute"></property>
+        <property name="prepareSecond" type="java.lang.Integer" column="prepareSecond"></property>
+        <property name="prepareRepeatTimes" type="java.lang.Integer" column="prepareRepeatTimes"></property>
+
+        <property name="responseSensor" type="java.lang.String" column="responseSensor"></property>
+        <property name="responseObservation" type="java.lang.String" column="responseObservation"></property>
+        <property name="responseThreshold" type="java.lang.Double" column="responseThreshold"></property>
+        <property name="responseUnit" type="java.lang.String" column="responseUnit"></property>
+        <property name="responseDay" type="java.lang.Integer" column="responseDay"></property>
+        <property name="responseHour" type="java.lang.Integer" column="responseHour"></property>
+        <property name="responseMinute" type="java.lang.Integer" column="responseMinute"></property>
+        <property name="responseSecond" type="java.lang.Integer" column="responseSecond"></property>
+        <property name="responseRepeatTimes" type="java.lang.Integer" column="responseRepeatTimes"></property>
+
+        <property name="recoverySensor" type="java.lang.String" column="recoverySensor"></property>
+        <property name="recoveryObservation" type="java.lang.String" column="recoveryObservation"></property>
+        <property name="recoveryThreshold" type="java.lang.Double" column="recoveryThreshold"></property>
+        <property name="recoveryUnit" type="java.lang.String" column="recoveryUnit"></property>
+        <property name="recoveryDay" type="java.lang.Integer" column="recoveryDay"></property>
+        <property name="recoveryHour" type="java.lang.Integer" column="recoveryHour"></property>
+        <property name="recoveryMinute" type="java.lang.Integer" column="recoveryMinute"></property>
+        <property name="recoverySecond" type="java.lang.Integer" column="recoverySecond"></property>
+        <property name="recoveryRepeatTimes" type="java.lang.Integer"  column="recoveryRepeatTimes"></property>
+        <set name="detectedEvents" cascade="save-update">
+            <key column="ses_id"></key>
+            <one-to-many class="DetectedEvent"></one-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

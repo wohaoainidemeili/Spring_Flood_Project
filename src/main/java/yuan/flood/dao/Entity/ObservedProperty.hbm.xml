@@ -1,0 +1,16 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="yuan.flood.dao.Entity">
+    <class name="ObservedProperty" table="fobs">
+        <id name="propertyID" type="java.lang.String" column="propertyID">
+           <generator class="assigned"></generator>
+        </id>
+        <property name="propertyName" type="java.lang.String" column="propertyName"></property>
+        <property name="unit" type="java.lang.String" column="unit"></property>
+        <set name="sensors" table="sensor_obs">
+            <key column="obs_id"></key>
+            <many-to-many class="Sensor" column="sensor_id"></many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>
