@@ -5,21 +5,15 @@
     <file url="file://$PROJECT_DIR$/src/main/java/yuan/flood/ses/SESAdapter_01.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/yuan/flood/ses/SESConnector.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/yuan/flood/ses/SESRequestBuilder_01.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/java/yuan/flood/sos/Decode.java" charset="GBK" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/chart-2.4.0/Chart.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/chart-2.4.0/Chart.min.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/highchart-5.0.7/highcharts.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/7cb5ec.png" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/7cb5ec.png" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/90ed7d.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/90ed7d.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/91e8e1.png" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/91e8e1.png" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/f15c80.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/f15c80.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/f7a35c.png" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/f7a35c.png" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/test1.png" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/src/main/webapp/resources/image/test2.png" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/webapp/resources/jquery.steps-1.1.0" charset="UTF-8" />
   </component>
 </project>

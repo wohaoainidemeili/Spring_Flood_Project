@@ -208,7 +208,7 @@
         //提交参数
         $.ajax({
           type:"post",
-          url:"subscribe",
+          url:"subscribeToSession",
           data:{"diagnosisSensor":sensorID_0,"diagnosisObservation":obsID_0,"diagnosisThreshold":thresholdValue_0,"diagnosisDay":dayValue_0,"diagnosisHour":hourValue_0,"diagnosisMinute":minuteValue_0,"diagnosisSecond":secondValue_0,"diagnosisRepeatTimes":timesValue_0,"diagnosisUnit":unitValue_0,
             "prepareSensor":sensorID_1,"prepareObservation":obsID_1,"prepareThreshold":thresholdValue_1,"prepareDay":dayValue_1,"prepareHour":hourValue_1,"prepareMinute":minuteValue_1,"prepareSecond":secondValue_1,"prepareRepeatTimes":timesValue_1,"prepareUnit":unitValue_1,
             "responseSensor":sensorID_2,"responseObservation":obsID_2,"responseThreshold":thresholdValue_2,"responseDay":dayValue_2,"responseHour":hourValue_2,"responseMinute":minuteValue_2,"responseSecond":secondValue_2,"responseRepeatTimes":timesValue_2,"responseUnit":unitValue_2,
@@ -216,7 +216,8 @@
           },
           success:function(data){
             if(data==true){
-              alter("成功注册！")
+              alter("成功注册！");
+              window.location.href="http://localhost/subscribe"
             }
           }
         })

@@ -58,7 +58,29 @@ public class SubscibeEventParams {
     //after subscribe the event we get eventSesID
     private String eventSesID;
 
+    //空间位置
+    private String posWKT;
+
+    private String userDefineName;
+
+
     private Set<DetectedEvent> detectedEvents=new HashSet<DetectedEvent>();
+
+    public String getPosWKT() {
+        return posWKT;
+    }
+
+    public void setPosWKT(String posWKT) {
+        this.posWKT = posWKT;
+    }
+
+    public String getUserDefineName() {
+        return userDefineName;
+    }
+
+    public void setUserDefineName(String userDefineName) {
+        this.userDefineName = userDefineName;
+    }
 
     public String getEventID() {
         return eventID;

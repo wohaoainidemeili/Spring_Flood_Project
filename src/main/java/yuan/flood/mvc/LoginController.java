@@ -2,10 +2,7 @@ package yuan.flood.mvc;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import yuan.flood.dao.Entity.DetectedEvent;
 import yuan.flood.dao.Entity.User;
 import yuan.flood.dao.IDao.IDetectedEventDao;
@@ -15,7 +12,9 @@ import yuan.flood.service.IService.IUserService;
 import yuan.flood.service.DecodeWNSEventService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 @Controller
 public class LoginController {
@@ -23,7 +22,7 @@ public class LoginController {
 	private IUserService userService;
 	@Autowired
 	private IDecodeWNSEventService decodeWNSEventService;
-	@RequestMapping(value = "/",method = RequestMethod.GET)
+	@RequestMapping(value = "/login",method = RequestMethod.GET)
 	public String printWelcome() {
 		//model.addAttribute("message", "Hello world!");
 		//decodeWNSEventService.getEventFromWNS();
@@ -35,7 +34,7 @@ public class LoginController {
 		user.setUserID("sasa");
 		user.setPassWord("sad");
 		userService.saveUser(user);
-		return "login";
+		return "/access";
 	}
 	@RequestMapping(value = "/check",method = RequestMethod.POST)
 	@ResponseBody
@@ -55,6 +54,18 @@ public class LoginController {
 		}
 
 		return isLegeal;
+	}
+	@CrossOrigin(value = "*",maxAge = 3600)
+	@RequestMapping(value = "/api/user")
+	@ResponseBody
+	public List<User> testCors(){
+		List<User> users = new ArrayList<User>();
+		User user=new User();
+		user.setUserID("1");
+		user.setPassWord("sad");
+		user.setUserLonID(132l);
+		users.add(user);
+		return users;
 	}
 
 }

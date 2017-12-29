@@ -2,7 +2,9 @@ package yuan.flood.service.IService;
 
 import yuan.flood.dao.Entity.ObservedProperty;
 import yuan.flood.dao.Entity.Sensor;
+import yuan.flood.sos.DataTimeSeries;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -12,4 +14,8 @@ public interface ISensorService {
     public List<Sensor> getSensors(String url);
     public void saveSensorsAndObsProperty(List<Sensor> sensors);
     public List<Sensor> findObseredPropertyBySensorID(String sensorID);
+
+    public List<DataTimeSeries> getSensorDataByTime(String sensorID, String observationID, Date startTime, Date endTime);
+
+    public DataTimeSeries getLatestSensorData(String sensorID, String observationID);
 }

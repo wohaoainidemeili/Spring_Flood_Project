@@ -65,9 +65,9 @@ public class BaseStringIDDaoImpl<T,PK> extends HibernateDaoSupport implements IB
 
     @Override
     public void saveOrUpdate(T entity) {
-       // getHibernateTemplate().merge(entity);
-        getHibernateTemplate().saveOrUpdate(entity);
-        getHibernateTemplate().merge(entity);
+//        getHibernateTemplate().merge(entity);
+//        getHibernateTemplate().saveOrUpdate(entity);
+       getHibernateTemplate().merge(entity);
     }
 
     @Override

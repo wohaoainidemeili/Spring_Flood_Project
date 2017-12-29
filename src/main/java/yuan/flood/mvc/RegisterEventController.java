@@ -1,13 +1,20 @@
 package yuan.flood.mvc;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import yuan.flood.dao.Entity.Sensor;
 import yuan.flood.dao.Entity.SubscibeEventParams;
+import yuan.flood.dao.Entity.UIDTO.EventParamsDTO;
+import yuan.flood.dao.Entity.UIDTO.SensorSetParamsDTO;
+import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
+import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
+import yuan.flood.dao.Entity.UIEntity.SensorDTO;
 import yuan.flood.dao.Entity.User;
 import yuan.flood.message.MessageRecieveThread;
 import yuan.flood.service.DecodeWNSEventService;
@@ -17,9 +24,15 @@ import yuan.flood.service.IService.ISubScribeEventService;
 import yuan.flood.ses.SESConnector;
 import yuan.flood.until.ReadConfig;
 import yuan.flood.until.SOSSESConfig;
+import yuan.flood.until.SessionNames;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,12 +64,21 @@ public class RegisterEventController {
             //sesConnector.subscribeEvent(subscirbeEventService.createSubscirbeEvent(subscibeEventParams));
             String sosUrl= SOSSESConfig.getSosurl();
             List<Sensor> sensors= sensorService.getSensors(sosUrl);
-            modelMap.addAttribute("sensorList",sensors);
+//            sensors.get(1).setSensorName("上沙兰（二）水文观测站");
+//            sensors.get(1).setLat(26.9333);
+//            sensors.get(1).setLon(114.8);
+            modelMap.addAttribute("sensorList", sensors);
         }else {
             return "login";
         }
         return "registerEvent";
     }
+
+    /**
+     * 获取所有的传感器信息
+     * @return
+     */
+    @CrossOrigin(value = "*")
     @RequestMapping(value = "/getSensorInfo",method = RequestMethod.POST)
     @ResponseBody
     public List<Sensor> getSensors(){
@@ -65,12 +87,22 @@ public class RegisterEventController {
         List<Sensor> sensors= sensorService.getSensors(sosUrl);
         //save sensor
         sensorService.saveSensorsAndObsProperty(sensors);
+//        sensors.get(1).setSensorName("上沙兰（二）水文观测站");
+//        sensors.get(1).setLat(26.9333);
+//        sensors.get(1).setLon(114.8);
         return sensors;
     }
 
+    /**
+     * 用于上传订阅事件选择的传感器
+     * @param request
+     * @return
+     */
+    @CrossOrigin(value = "*")
     @RequestMapping(value = "/getSelectSensors",method = RequestMethod.POST)
     @ResponseBody
-    public boolean getSelectSenosors(HttpServletRequest request,String[] sensorIDs){
+    public boolean getSelectSenosors(HttpServletRequest request){
+        String[] sensorIDs= (String[]) request.getParameterValues("sensorIDs");
         if (sensorIDs!=null&&sensorIDs.length>0){
             HttpSession session=request.getSession();
             session.removeAttribute("selectSensors");
@@ -79,6 +111,77 @@ public class RegisterEventController {
         }else{
             return false;
         }
-
     }
+
+    @CrossOrigin(value = "*")
+    @RequestMapping(value = "/getSelectSensorsJson",method = RequestMethod.POST)
+    @ResponseBody
+    public boolean getSelectSenosorsJson(HttpServletRequest request, HttpServletResponse response, @RequestBody String[] sensorIDs) throws IOException {
+//        if (sensorIDs==null||sensorIDs.length==0) {response.sendRedirect("error");return false;}
+        if (sensorIDs!=null&&sensorIDs.length>0){
+            HttpSession session=request.getSession();
+            session.removeAttribute("selectSensors");
+            session.setAttribute("selectSensors",sensorIDs);
+//            response.sendRedirect("simpleSubscribeEvnt");
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * 用于生成React订阅界面的Json数据，实时更新
+     */
+    @CrossOrigin(value = "*")
+    @RequestMapping(value = "/getSubScribeJson")
+    @ResponseBody
+    public SubscribeParamsDTO getSubScribeDTO(HttpServletRequest request){
+
+       //创建基本的返回数据内容
+        SubscribeParamsDTO subscribeParamsDTO=new SubscribeParamsDTO();
+        SensorSetParamsDTO sensorSetParamsDTO=new SensorSetParamsDTO();
+        EventParamsDTO eventParamsDTO=new EventParamsDTO();
+
+        //如果session缓存中不包含选中的传感器ID，直接返回结果
+        HttpSession session=request.getSession();
+        String[] sensorIDs= (String[]) session.getAttribute("selectSensors");
+        SubscibeEventParams subscibeEventParams = (SubscibeEventParams) session.getAttribute(SessionNames.SETTED_EVENT_PARAMS);
+
+        if (sensorIDs==null||sensorIDs.length==0) {
+            subscribeParamsDTO.setDataset(sensorSetParamsDTO);
+            subscribeParamsDTO.setEvent(eventParamsDTO);
+            return subscribeParamsDTO;
+        }
+        //如果当前包含sensors的缓存，则进行数据的修改
+        sensorSetParamsDTO.setFlag(true);
+        List<SensorDTO> sensorDTOList = new ArrayList<SensorDTO>();
+        for (int i=0;i<sensorIDs.length;i++) {
+            List<Sensor> sensors = sensorService.findObseredPropertyBySensorID(sensorIDs[i]);
+            if (sensors.isEmpty() || sensors == null) {
+                continue;
+            }
+            for (int j=0;j<sensors.size();j++) {
+                sensorDTOList.add(ConvertUtil.getSensorDTOfromSensor(sensors.get(j)));
+            }
+
+        }
+
+        sensorSetParamsDTO.setSensorList(sensorDTOList);
+
+        //再获取订阅参数
+       if (subscibeEventParams==null){
+           subscribeParamsDTO.setDataset(sensorSetParamsDTO);
+           subscribeParamsDTO.setEvent(eventParamsDTO);
+           return subscribeParamsDTO;
+       }
+
+       //订阅参数缓存不为空，则进行数据设置
+        eventParamsDTO.setFlag(true);
+        eventParamsDTO.setParams(ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(subscibeEventParams));
+
+        subscribeParamsDTO.setDataset(sensorSetParamsDTO);
+        subscribeParamsDTO.setEvent(eventParamsDTO);
+        return subscribeParamsDTO;
+    }
+
 }
