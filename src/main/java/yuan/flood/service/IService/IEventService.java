@@ -18,4 +18,8 @@ public interface IEventService {
     public Long getMaxEventOrder();
     public String getDetectedEventBySESID(String url,String sesid);
     public SubscibeEventParams getRegisteredEventParamsBySesid(String sesid);
+    public String getDetectedDataInJsonBySESID(String url, String sesid);
+
+    public SubscibeEventParams getRegisteredEventParamsByEventSesID(String eventSesID);
+
 }

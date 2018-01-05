@@ -1,0 +1,20 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="yuan.flood.dao.Entity">
+    <class name="DetectedFullEvent" table="fDetectedFullEvent">
+        <id name="id" type="java.lang.Long" column="id">
+            <generator class="sequence">
+                <param name="sequence">detectfull_id_seq</param>
+            </generator>
+        </id>
+        <property name="startTime" type="java.util.Date" column="startTime"></property>
+        <property name="endTime" type="java.util.Date" column="endTime"></property>
+        <property name="diagnosisStartTime" type="java.util.Date" column="diagnosisStartTime"></property>
+        <property name="prepareStartTime" type="java.util.Date" column="endTimeLong"></property>
+        <property name="responseStartTime" type="java.util.Date" column="responseStartTime"></property>
+        <property name="recoveryStartTime" type="java.util.Date" column="recoveryStartTime"></property>
+        <property name="recoveryEndTime" type="java.util.Date" column="recoveryEndTime"></property>
+        <many-to-one name="event" lazy="false" class="SubscibeEventParams" cascade="save-update" column="ses_id"></many-to-one>
+    </class>
+</hibernate-mapping>

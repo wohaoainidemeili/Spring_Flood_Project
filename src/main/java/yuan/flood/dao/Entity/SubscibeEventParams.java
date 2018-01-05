@@ -58,21 +58,18 @@ public class SubscibeEventParams {
     //after subscribe the event we get eventSesID
     private String eventSesID;
 
-    //空间位置
-    private String posWKT;
+    //空间位置,最大最小经纬度决定，构建一个矩形框
+    private double maxLat;
+    private double minLat;
+    private double maxLon;
+    private double minLon;
 
     private String userDefineName;
+    private String email;
 
+    private User user;
 
     private Set<DetectedEvent> detectedEvents=new HashSet<DetectedEvent>();
-
-    public String getPosWKT() {
-        return posWKT;
-    }
-
-    public void setPosWKT(String posWKT) {
-        this.posWKT = posWKT;
-    }
 
     public String getUserDefineName() {
         return userDefineName;
@@ -402,11 +399,59 @@ public class SubscibeEventParams {
         this.eventSesID = eventSesID;
     }
 
+    public double getMaxLat() {
+        return maxLat;
+    }
+
+    public void setMaxLat(double maxLat) {
+        this.maxLat = maxLat;
+    }
+
+    public double getMinLat() {
+        return minLat;
+    }
+
+    public void setMinLat(double minLat) {
+        this.minLat = minLat;
+    }
+
+    public double getMaxLon() {
+        return maxLon;
+    }
+
+    public void setMaxLon(double maxLon) {
+        this.maxLon = maxLon;
+    }
+
+    public double getMinLon() {
+        return minLon;
+    }
+
+    public void setMinLon(double minLon) {
+        this.minLon = minLon;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     public Set<DetectedEvent> getDetectedEvents() {
         return detectedEvents;
     }
 
     public void setDetectedEvents(Set<DetectedEvent> detectedEvents) {
         this.detectedEvents = detectedEvents;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

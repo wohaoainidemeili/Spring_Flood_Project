@@ -87,7 +87,12 @@ public class ConvertUtil {
         subscribeEventParamsDTO.setResponseThreshold(subscibeEventParams.getResponseThreshold());
         subscribeEventParamsDTO.setResponseUnit(subscibeEventParams.getResponseUnit());
 
-        subscribeEventParamsDTO.setPosWKT(subscibeEventParams.getPosWKT());
+        subscribeEventParamsDTO.setMaxLat(subscibeEventParams.getMaxLat());
+        subscribeEventParamsDTO.setMaxLon(subscibeEventParams.getMaxLon());
+        subscribeEventParamsDTO.setMinLat(subscibeEventParams.getMinLat());
+        subscribeEventParamsDTO.setMinLon(subscibeEventParams.getMinLon());
+        subscribeEventParamsDTO.setEmail(subscibeEventParams.getEmail());
+
         subscribeEventParamsDTO.setUserDefineName(subscibeEventParams.getUserDefineName());
 
         return subscribeEventParamsDTO;

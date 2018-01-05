@@ -182,6 +182,7 @@ public class EventService implements IEventService{
     public SubscibeEventParams getRegisteredEventParamsBySesid(String sesid) {
         String findStr="from SubscibeEventParams s where s.eventID='"+sesid+"'";
         List events= eventDao.find(findStr);
+        if (events==null||events.isEmpty()) return null;
         return (SubscibeEventParams)events.get(0);
     }
 
@@ -243,4 +244,118 @@ public class EventService implements IEventService{
         return ;
     }
 
+    @Override
+    public String getDetectedDataInJsonBySESID(String url, String sesid) {
+        String seriesRes=null;
+        List<DataTimeSeries> dataTimeSeries=null;
+        //get different sensor;
+        SubscibeEventParams subscibeEventParams= getRegisteredEventParamsBySesid(sesid);
+        String diagnosissSensorID=subscibeEventParams.getDiagnosisSensor();
+        String prepareSensorID=subscibeEventParams.getPrepareSensor();
+        String responseSensorID=subscibeEventParams.getResponseSensor();
+        String recoverySensorID=subscibeEventParams.getRecoverySensor();
+        List<String> differSensors=new ArrayList<String>();
+        differSensors.add(diagnosissSensorID);
+        if (!differSensors.contains(prepareSensorID)){
+            differSensors.add(prepareSensorID);
+        }
+        if (!differSensors.contains(responseSensorID)){
+            differSensors.add(responseSensorID);
+        }
+        if (!differSensors.contains(recoverySensorID)){
+            differSensors.add(recoverySensorID);
+        }
+        //try show different sensor observation,if the subscribe contains different sensors
+        StringBuilder stringBuilder=new StringBuilder();
+        stringBuilder.append("[");
+        int Count=0;
+        for(String SensorID:differSensors){
+            if (Count==0)
+                stringBuilder.append("{");
+            else stringBuilder.append(",{");
+            Count++;
+            String observationRequestXML= encode.getGetObservationXML(subscibeEventParams.getDiagnosisSensor(), subscibeEventParams.getDiagnosisObservation());
+            String responseXML= methods.sendPost(url, observationRequestXML);
+            try {
+                //get data form observation
+                dataTimeSeries= decode.decodeObservation(responseXML);
+                if (dataTimeSeries==null||dataTimeSeries.size()==0) {
+                    stringBuilder.append("}");
+                    continue;
+                }
+                //get event form event database
+                String findStr="from DetectedEvent d where d.event.eventID='"+sesid+"' order by d.startTimeLong";
+                List events= detectedEventDao.find(findStr);
+
+                //get different type of information
+                List<DetectedEvent> differEvents= getTimeChange(events);
+                //get all type information
+
+                //create series json using the data
+                stringBuilder.append("\"name\":"+"\""+SensorID+"\","+ "\"type\": \"areaspline\","
+                        +"\"zoneAxis\": \"x\","
+                        +"\"tooltip\": {\"shared\": true,\"useHTML\": true,\" headerFormat\": \"<small>{point.key}</small><br/><table>\"" +
+                        ",\"pointFormat\": \"<tr><td style=\"color: {series.color}\">{series.name}: </td>"
+                        +"<td style=\"text-align: right\"><b>{point.y}m</b></td></tr><br/>" +
+                        "<tr><td style=\"color: {series.color}\">EventType: </td><td style=\"text-align: right\"><b>{point.className}</b></td></tr>\",\"footerFormat\": \"</table>\",\"valueDecimals\": 2},");
+                //formating data array and zones array
+                //add data
+                stringBuilder.append("\"data\":[");
+                getAllObservationEventType(differEvents,dataTimeSeries);
+                for (int i=0;i<dataTimeSeries.size()-1;i++){
+                    StringBuilder databuilderStr=new StringBuilder();
+                    databuilderStr.append("{\"x\":"+dataTimeSeries.get(i).getTimeLon()
+                            +",\"y\":"+dataTimeSeries.get(i).getDataValue()+",\"className\":"+"\""+dataTimeSeries.get(i).getEventType()+"\"},");
+                    stringBuilder.append(databuilderStr);
+
+                }
+                StringBuilder lastDatStr=new StringBuilder();
+                lastDatStr.append("{\"x\":"+dataTimeSeries.get(dataTimeSeries.size()-1).getTimeLon()
+                        +",\"y\":"+dataTimeSeries.get(dataTimeSeries.size()-1).getDataValue()+",\"className\":"+"\""+dataTimeSeries.get(dataTimeSeries.size()-1).getEventType()+"\"}");
+                stringBuilder.append(lastDatStr);
+                stringBuilder.append("],");
+                //add zones color diagnosis:green'#90ed7d',prepare:yellow '#f7a35c',response:red'#f15c80',recovery:blue #91e8e1,noEvent,white'#ffffff'
+                stringBuilder.append("\"zones\": [");
+                for (int i=0;i<differEvents.size();i++){
+                    StringBuilder zonebuilderStr=new StringBuilder();
+                    Long zoneValue= differEvents.get(i).getStartTimeLong()-1*60*1000;
+                    //create zone
+                    if (i==0)
+                        if (zoneValue>dataTimeSeries.get(0).getTimeLon())
+                            zonebuilderStr.append("{\"value\":"+zoneValue+",\"color\": \"#7cb5ec\"},");
+                        else zonebuilderStr.append("{\"value\":"+zoneValue+", \"color\": \"#91e8e1\"},");
+                    else if (differEvents.get(i-1).getEventTypeName().equals("diagnosis")){
+                        zonebuilderStr.append("{\"value\":"+zoneValue+",\"color\": \"#91e8e1\"},");
+                    }else if (differEvents.get(i-1).getEventTypeName().equals("prepare")){
+                        zonebuilderStr.append("{\"value\":"+zoneValue+",\"color\":\"#f7a35c\"},");
+                    }else if (differEvents.get(i-1).getEventTypeName().equals("response")){
+                        zonebuilderStr.append("{\"value\":"+zoneValue+",\"color\":\"#f15c80\"},");
+                    }else if (differEvents.get(i-1).getEventTypeName().equals("recovery")) {
+                        zonebuilderStr.append("{\"value\":" + zoneValue + ",\"color\":\"#90ed7d\"},");
+                    }
+                    stringBuilder.append(zonebuilderStr);
+
+                }
+                StringBuilder zonebuilderStr1=new StringBuilder();
+                zonebuilderStr1.append("{ \"color\": \"#7cb5ec\"}");
+                stringBuilder.append(zonebuilderStr1);
+                stringBuilder.append("]");
+                stringBuilder.append("}");
+            } catch (XmlException e) {
+                e.printStackTrace();
+            }
+        }
+        stringBuilder.append("]");
+        String series= stringBuilder.toString();
+
+        return series;
+    }
+
+    @Override
+    public SubscibeEventParams getRegisteredEventParamsByEventSesID(String eventSesID) {
+        String findStr="from SubscibeEventParams s where s.eventSesID='"+eventSesID+"'";
+        List events= eventDao.find(findStr);
+        if (events==null||events.isEmpty()) return null;
+        return (SubscibeEventParams)events.get(0);
+    }
 }

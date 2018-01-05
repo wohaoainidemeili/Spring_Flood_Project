@@ -50,9 +50,17 @@
         <property name="recoveryMinute" type="java.lang.Integer" column="recoveryMinute"></property>
         <property name="recoverySecond" type="java.lang.Integer" column="recoverySecond"></property>
         <property name="recoveryRepeatTimes" type="java.lang.Integer"  column="recoveryRepeatTimes"></property>
+
+        <property name="userDefineName" type="java.lang.String" column="userDefineName"/>
+        <property name="maxLat" type="java.lang.Double" column="maxLat"/>
+        <property name="minLat" type="java.lang.Double" column="minLat"/>
+        <property name="maxLon" type="java.lang.Double" column="maxLon"/>
+        <property name="minLon" type="java.lang.Double" column="minLon"/>
+        <property name="email" type="java.lang.String" column="email"/>
         <set name="detectedEvents" cascade="save-update">
             <key column="ses_id"></key>
             <one-to-many class="DetectedEvent"></one-to-many>
         </set>
+        <many-to-one name="user" cascade="save-update" lazy="false" class="User" column="user_id"></many-to-one>
     </class>
 </hibernate-mapping>

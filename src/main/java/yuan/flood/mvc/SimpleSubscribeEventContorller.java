@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import yuan.flood.dao.Entity.ObservedProperty;
 import yuan.flood.dao.Entity.Sensor;
 import yuan.flood.dao.Entity.SubscibeEventParams;
+import yuan.flood.dao.Entity.UIDTO.FloodResult;
 import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
 import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
 import yuan.flood.dao.Entity.UIEntity.SubscribeEventParamsDTO;
+import yuan.flood.dao.Entity.User;
 import yuan.flood.service.IService.IEventService;
 import yuan.flood.service.IService.ISensorService;
 import yuan.flood.service.IService.ISubScribeEventService;
@@ -174,10 +176,10 @@ public class SimpleSubscribeEventContorller {
         subscibeEventParams.setRecoveryUnit(request.getParameter("recoveryUnit"));
 
         //get the max order of event
-        Long ID= eventService.getMaxEventOrder();
-        subscibeEventParams.setOrder(ID);
-        subscibeEventParams.setEventID("Event"+ID);
-        subscibeEventParams.setEventName("Event"+ID);
+//        Long ID= eventService.getMaxEventOrder();
+//        subscibeEventParams.setOrder(ID);
+//        subscibeEventParams.setEventID("Event"+ID);
+//        subscibeEventParams.setEventName("Event"+ID);
         // suscribe ses
 //        String sesID= sesConnector.subscribeEvent(subscirbeEventService.createSubscirbeEvent(subscibeEventParams));
 //        subscibeEventParams.setEventSesID(sesID);
@@ -185,6 +187,9 @@ public class SimpleSubscribeEventContorller {
         //insert the ses params to db
 
         //create subscribeEventParams session
+        User user = (User) request.getSession().getAttribute(SessionNames.USER);
+        subscibeEventParams.setUser(user);
+
         HttpSession session = request.getSession();
         session.removeAttribute(SessionNames.SETTED_EVENT_PARAMS);
         session.setAttribute(SessionNames.SETTED_EVENT_PARAMS, subscibeEventParams);
@@ -198,19 +203,32 @@ public class SimpleSubscribeEventContorller {
     @CrossOrigin(value = "*")
     @RequestMapping(method = RequestMethod.POST, value = "/subscribeWithSession")
     @ResponseBody
-    public boolean getSubscribeEventRegiistered(HttpServletRequest request, @RequestBody SubscibeEventParams params) {
+    public FloodResult<String> getSubscribeEventRegiistered(HttpServletRequest request, @RequestBody SubscibeEventParams params) {
 //        SubscibeEventParams subscibeEventParams = ConvertUtil.getSubscibeEventParamsfromSubscribeEventParamsDTO(params);
+        FloodResult<String> floodResult = new FloodResult<String>();
+        floodResult.setFlag(true);
         String sesID = sesConnector.subscribeEvent(subscirbeEventService.createSubscirbeEvent(params));
-        if (Strings.isNullOrEmpty(sesID)) return false;
+        if (Strings.isNullOrEmpty(sesID)) {
+            floodResult.setFlag(false);
+             floodResult.setMessage("事件注册异常！");
+            return floodResult;
+        }
+
+        //计算最大最小的空间范围
+        subscirbeEventService.getEventSpatialArea(params);
 
         //注册完成后入库，清理缓存
-
         params.setEventSesID(sesID);
+        Long ID= eventService.getMaxEventOrder();
+        params.setOrder(ID);
+        params.setEventID("Event"+ID);
+//        params.setEventName("Event"+ID);
         eventService.saveSubscribeEvent(params);
 
         HttpSession session = request.getSession();
         session.removeAttribute(SessionNames.SELECT_SENSORS);
         session.removeAttribute(SessionNames.SETTED_EVENT_PARAMS);
-        return true;
+        floodResult.setObject(sesID);
+        return floodResult;
     }
 }

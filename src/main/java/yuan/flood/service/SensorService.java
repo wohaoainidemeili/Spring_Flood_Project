@@ -8,6 +8,7 @@ import yuan.flood.dao.Entity.Sensor;
 import yuan.flood.dao.IDao.IObsPropertyDao;
 import yuan.flood.dao.IDao.ISensorDao;
 import yuan.flood.service.IService.ISensorService;
+import yuan.flood.sos.DataTimeSeries;
 import yuan.flood.sos.Decode;
 import yuan.flood.sos.Encode;
 import yuan.flood.until.HttpMethods;
@@ -15,6 +16,7 @@ import yuan.flood.until.ReadConfig;
 import yuan.flood.until.SOSSESConfig;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -91,4 +93,35 @@ public class SensorService implements ISensorService {
        List<Sensor> result=sensorDao.find(hql);
        return result;
    }
+
+    @Override
+    public List<DataTimeSeries> getSensorDataByTime(String sensorID, String observationID, Date startTime, Date endTime) {
+        List<DataTimeSeries> dataTimeSeries = null;
+        Encode encode = new Encode();
+        Decode decode = new Decode();
+        String dataRequestXML = encode.getGetObservationByTimeXML(sensorID, observationID, startTime, endTime);
+        try {
+           dataTimeSeries= decode.decodeObservation(dataRequestXML);
+        } catch (XmlException e) {
+            e.printStackTrace();
+        }
+
+        return dataTimeSeries;
+    }
+
+    @Override
+    public DataTimeSeries getLatestSensorData(String sensorID, String observationID) {
+        List<DataTimeSeries> dataTimeSeries = null;
+        Encode encode = new Encode();
+        Decode decode = new Decode();
+        String dataRequestXML = encode.getGetLatestObservationXML(sensorID, observationID);
+
+        try {
+            dataTimeSeries = decode.decodeObservation(dataRequestXML);
+        } catch (XmlException e) {
+            e.printStackTrace();
+        }
+        if (dataTimeSeries==null||dataTimeSeries.isEmpty()) return null;
+        else return dataTimeSeries.get(0);
+    }
 }

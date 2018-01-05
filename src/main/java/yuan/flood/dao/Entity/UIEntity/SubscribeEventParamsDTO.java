@@ -53,9 +53,13 @@ public class SubscribeEventParamsDTO {
     private String eventSesID;
 
     //空间位置
-    private String posWKT;
+    private double maxLat;
+    private double minLat;
+    private double maxLon;
+    private double minLon;
 
     private String userDefineName;
+    private String email;
 
     public String getUserDefineName() {
         return userDefineName;
@@ -385,11 +389,43 @@ public class SubscribeEventParamsDTO {
         this.eventSesID = eventSesID;
     }
 
-    public String getPosWKT() {
-        return posWKT;
+    public double getMaxLat() {
+        return maxLat;
     }
 
-    public void setPosWKT(String posWKT) {
-        this.posWKT = posWKT;
+    public void setMaxLat(double maxLat) {
+        this.maxLat = maxLat;
+    }
+
+    public double getMinLat() {
+        return minLat;
+    }
+
+    public void setMinLat(double minLat) {
+        this.minLat = minLat;
+    }
+
+    public double getMaxLon() {
+        return maxLon;
+    }
+
+    public void setMaxLon(double maxLon) {
+        this.maxLon = maxLon;
+    }
+
+    public double getMinLon() {
+        return minLon;
+    }
+
+    public void setMinLon(double minLon) {
+        this.minLon = minLon;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

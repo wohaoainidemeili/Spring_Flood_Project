@@ -1,7 +1,8 @@
 package yuan.flood.until;
 
 public class SessionNames {
-    public static String SELECT_SENSORS = "selectSensors";
-    public static String SETTED_EVENT_PARAMS = "settedEventParams";
+    public final static String USER = "user";
+    public final static String SELECT_SENSORS = "selectSensors";
+    public final static String SETTED_EVENT_PARAMS = "settedEventParams";
 
 }

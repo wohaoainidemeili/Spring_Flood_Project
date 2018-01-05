@@ -20,19 +20,25 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by Yuan on 2017/2/17.
  */
 @Service
 public class DecodeWNSEventService implements IDecodeWNSEventService{
+    //用于存储消息内容
+    public static Queue<String> queue=new ConcurrentLinkedQueue<String>() ;
+
+    private ExecutorService executorService= Executors.newFixedThreadPool(4);
     @Autowired
     private IEventDao eventDao;
     @Autowired
     private IDetectedEventDao detectedEventDao;
+
     public void saveEventFromWNS(){
         try {
             ServerSocket serverSocket=new ServerSocket(8092);
@@ -85,6 +91,7 @@ public class DecodeWNSEventService implements IDecodeWNSEventService{
                 cursor.toChild(0);
                 cursor.toChild(1);
                 String eventMessage=cursor.getTextValue();
+                queue.offer(eventMessage);
 
                 String[] message_IdStr= eventMessage.split(":");
 
@@ -101,8 +108,11 @@ public class DecodeWNSEventService implements IDecodeWNSEventService{
                 String eventStr="from SubscibeEventParams s where s.eventID='"+message_IdStr[0]+"'";
                 List subscibeEventParams=eventDao.find(eventStr);
                 detectedEvent.setEvent((SubscibeEventParams) subscibeEventParams.get(0));
+
+                //需要消息内容，事件信息，以及事件对应的服务内容
 //                detectedEvent.setEvent(s);
                 detectedEventDao.saveOrUpdate(detectedEvent);
+
 
             }
 
@@ -113,6 +123,13 @@ public class DecodeWNSEventService implements IDecodeWNSEventService{
             e.printStackTrace();
         } catch (ParseException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void getEventService(){
+        //根据队列内容，返回连接和当前状态
+        while (!queue.isEmpty()){
+
         }
     }
 

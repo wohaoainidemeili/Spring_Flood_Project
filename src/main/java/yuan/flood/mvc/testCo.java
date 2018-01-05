@@ -1,15 +1,14 @@
 package yuan.flood.mvc;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import yuan.flood.sos.DataTimeSeries;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Yuan on 2017/2/11.
@@ -28,6 +27,24 @@ public class testCo {
         res="[{type:'areaspline',data:[29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]," +
                 "pointStart:1420070400000,pointIntervalUnit:'month',zoneAxis:'x',zones:[{value:1433116800000" +
                 ",color:'#90ed7d'},{value:1435708800000,color:'#f15c80'},{value:1441065600000,color:'#90ed7d'}]}]";
+        return res;
+    }
+
+
+    @CrossOrigin(value = "*")
+    @ResponseBody
+    @RequestMapping(value = "/rand")
+    public Integer getRandom() {
+        Random random = new Random();
+        return random.nextInt();
+    }
+    @CrossOrigin(value = "*")
+    @ResponseBody
+    @RequestMapping(value = "/sadJson")
+    public String dataSadTest(){
+        String res = "[{\"type\":\"areaspline\",\"data\":[29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]," +
+                "\"pointStart\":1420070400000,\"pointIntervalUnit\":\"month\",\"zoneAxis\":\"x\",\"zones\":[{\"value\":1433116800000" +
+                ",\"color\":\"#90ed7d\"},{\"value\":1435708800000,\"color\":\"#f15c80\"},{\"value\":1441065600000,\"color\":\"#90ed7d\"}]}]";
         return res;
     }
 }

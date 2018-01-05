@@ -9,6 +9,7 @@ public class User implements Serializable {
     private Long userLonID;
     private String userID;
     private String passWord;
+    private String emailAddress;
 
     public Long getUserLonID() {
         return userLonID;
@@ -32,5 +33,13 @@ public class User implements Serializable {
 
     public void setPassWord(String passWord) {
         this.passWord = passWord;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 }

@@ -217,7 +217,7 @@
           success:function(data){
             if(data==true){
               alter("成功注册！");
-              window.location.href="http://localhost/subscribe"
+//              window.location.href="http://localhost/subscribe"
             }
           }
         })
