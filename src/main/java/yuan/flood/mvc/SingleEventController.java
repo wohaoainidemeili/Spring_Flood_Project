@@ -287,10 +287,37 @@ public class SingleEventController {
      * @param eventID
      * @return
      */
-    public FloodResult<String> getServiceUrl(@RequestBody String eventID) {
-        String url = "http://www.myflood.com/phase/diagnosis";
-        String message;
-        return null;
+    @CrossOrigin(value = "*")
+    @ResponseBody
+    @RequestMapping(value = "/getEventStatus", method = RequestMethod.POST)
+    public FloodResult<String> getServiceMessage(@RequestBody String eventID) {
+        FloodResult<String> floodResult = new FloodResult<>();
+        floodResult.setFlag(true);
+
+        if (Strings.isNullOrEmpty(eventID)){
+            floodResult.setFlag(false);
+            floodResult.setMessage("事件ID不可为空");
+            return floodResult;
+        }
+
+        SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsByEventSesID(eventID);
+        if (subscibeEventParams==null){
+            floodResult.setFlag(false);
+            floodResult.setMessage("无法查找到当前事件");
+            return floodResult;
+        }
+
+        //根据eventID查找当前状态
+        String ID = subscibeEventParams.getEventID();
+        //返回当前状态
+        String latestType = eventService.getLatestEventType(ID);
+
+        if (Strings.isNullOrEmpty(latestType)) {
+            floodResult.setObject("无事件状态o ");
+        }else {
+            floodResult.setObject(latestType);
+        }
+        return floodResult;
     }
 
 }

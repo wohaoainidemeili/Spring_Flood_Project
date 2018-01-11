@@ -456,4 +456,15 @@ public class EventService implements IEventService{
         if (events==null||events.isEmpty()) return null;
         return events;
     }
+
+    @Override
+    public String getLatestEventType(String sesID) {
+        String maxHql = "from DetectedEvent d where d.startTimeLong=(select max(de.startTimeLong) from DetectedEvent de where de.event.eventID='" + sesID + "')";
+        List<DetectedEvent> detectEvents = detectedEventDao.find(maxHql);
+        if (detectEvents == null || detectEvents.isEmpty()) {
+            return null;
+        }
+        return detectEvents.get(0).getEventTypeName();
+    }
+
 }
