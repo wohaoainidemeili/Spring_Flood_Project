@@ -14,6 +14,11 @@ public class SOSSESConfig {
     String sesDefaultTopic="ses_default_topic";
     String sesRegisterPublisherLifeTime="ses_register_publisher_lifetime";
     String sesRegisterPublisherEndpoint="ses_register_publisher_endpoint";
+    String diagnosisServiceClass = "diagnosisService";
+    String prepareServiceClass = "prepareService";
+    String responseServiceClass = "responseService";
+    String recoveryServiceClass = "recoveryService";
+
 
     static String sosurl;
     static String sesurl;
@@ -23,6 +28,11 @@ public class SOSSESConfig {
     static String sesdefaulttopic;
     static String sesregisterpublisherlifetime;
     static String sesregisterpublisherendpoint;
+    static String diagnosisserviceclass;
+    static String prepareserviceclass;
+    static String responseserviceclass;
+    static String recoveryserviceclass;
+
     public SOSSESConfig(Properties properties){
         setSosurl(properties.getProperty(sosUrl));
         setSesurl(properties.getProperty(sesUrl));
@@ -32,6 +42,12 @@ public class SOSSESConfig {
         setSesdefaulttopic(properties.getProperty(sesDefaultTopic));
         setSesregisterpublisherlifetime(properties.getProperty(sesRegisterPublisherLifeTime));
         setSesregisterpublisherendpoint(properties.getProperty(sesRegisterPublisherEndpoint));
+
+        setDiagnosisserviceclass(properties.getProperty(diagnosisServiceClass));
+        setPrepareserviceclass(properties.getProperty(prepareServiceClass));
+        setResponseserviceclass(properties.getProperty(responseServiceClass));
+        setRecoveryserviceclass(properties.getProperty(recoveryServiceClass));
+
     }
 
     public static String getSosurl() {
@@ -96,5 +112,37 @@ public class SOSSESConfig {
 
     public static void setSesregisterpublisherendpoint(String sesregisterpublisherendpoint) {
         SOSSESConfig.sesregisterpublisherendpoint = sesregisterpublisherendpoint;
+    }
+
+    public static String getDiagnosisserviceclass() {
+        return diagnosisserviceclass;
+    }
+
+    public static void setDiagnosisserviceclass(String diagnosisserviceclass) {
+        SOSSESConfig.diagnosisserviceclass = diagnosisserviceclass;
+    }
+
+    public static String getPrepareserviceclass() {
+        return prepareserviceclass;
+    }
+
+    public static void setPrepareserviceclass(String prepareserviceclass) {
+        SOSSESConfig.prepareserviceclass = prepareserviceclass;
+    }
+
+    public static String getResponseserviceclass() {
+        return responseserviceclass;
+    }
+
+    public static void setResponseserviceclass(String responseserviceclass) {
+        SOSSESConfig.responseserviceclass = responseserviceclass;
+    }
+
+    public static String getRecoveryserviceclass() {
+        return recoveryserviceclass;
+    }
+
+    public static void setRecoveryserviceclass(String recoveryserviceclass) {
+        SOSSESConfig.recoveryserviceclass = recoveryserviceclass;
     }
 }

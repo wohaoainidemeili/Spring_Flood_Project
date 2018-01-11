@@ -3,6 +3,8 @@ package yuan.flood.dao.Entity.UIEntity;
 import yuan.flood.dao.Entity.ObservedProperty;
 import yuan.flood.dao.Entity.Sensor;
 import yuan.flood.dao.Entity.SubscibeEventParams;
+import yuan.flood.dao.Entity.UIDTO.EventPhaseDTO;
+import yuan.flood.dao.Entity.UIDTO.EventSensorPropertyDTO;
 import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
 
 import java.util.*;
@@ -101,5 +103,17 @@ public class ConvertUtil {
 
     public static SubscibeEventParams getSubscibeEventParamsfromSubscribeEventParamsDTO(SubscribeEventParamsDTO subscribeEventParamsDTO) {
         return new SubscibeEventParams();
+    }
+
+    public static EventSensorPropertyDTO getEventSensorPropertyDTOFromSensorAndProperty(Sensor sensor, ObservedProperty property) {
+        EventSensorPropertyDTO eventSensorPropertyDTO = new EventSensorPropertyDTO();
+        eventSensorPropertyDTO.setSensorID(sensor.getSensorID());
+        eventSensorPropertyDTO.setSensorName(sensor.getSensorName());
+        eventSensorPropertyDTO.setLat(sensor.getLat());
+        eventSensorPropertyDTO.setLon(sensor.getLon());
+        eventSensorPropertyDTO.setPropertyID(property.getPropertyID());
+        eventSensorPropertyDTO.setPropertyName(property.getPropertyName());
+        eventSensorPropertyDTO.setUnit(property.getUnit());
+        return eventSensorPropertyDTO;
     }
 }

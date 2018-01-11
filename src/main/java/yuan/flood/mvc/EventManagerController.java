@@ -7,12 +7,15 @@ import jdk.nashorn.internal.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import yuan.flood.dao.Entity.SubscibeEventParams;
+import yuan.flood.dao.Entity.UIDTO.FloodResult;
+import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
+import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
+import yuan.flood.dao.Entity.UIEntity.SubscribeEventParamsDTO;
 import yuan.flood.dao.Entity.User;
 import yuan.flood.service.IService.IEventService;
+import yuan.flood.until.SessionNames;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Yuan on 2017/1/11.
@@ -70,6 +74,37 @@ public class EventManagerController {
         users.add(user2);
         myMap.put("users",users);
         return myMap ;
+    }
+
+    /**
+     * 拉取所有的事件，不单单包括一个用户的
+     * @param request
+     * @return
+     */
+    @RequestMapping(value = "/getAllEventParams", method = RequestMethod.POST)
+    @ResponseBody
+    public FloodResult<List<SubscribeEventParamsDTO>> getAllEventParamsByUser(HttpServletRequest request) {
+        FloodResult<List<SubscribeEventParamsDTO>> floodResult = new FloodResult<>();
+        floodResult.setFlag(true);
+        List<SubscribeEventParamsDTO> subscribeEventParamsDTOS = new ArrayList<>();
+        try {
+            List<SubscibeEventParams> eventParams = eventService.getAllRegisteredEvent();
+
+            if (eventParams == null || eventParams.isEmpty()) {
+                floodResult.setFlag(true);
+                floodResult.setMessage("无注册事件");
+                floodResult.setObject(subscribeEventParamsDTOS);
+                return floodResult;
+            }
+            for (int i = 0; i < eventParams.size(); i++) {
+                subscribeEventParamsDTOS.add(ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(eventParams.get(0)));
+            }
+        } catch (Exception e) {
+            floodResult.setFlag(false);
+            floodResult.setMessage("获取事件信息错误！");
+        }
+        floodResult.setObject(subscribeEventParamsDTOS);
+        return floodResult;
     }
 
 }
