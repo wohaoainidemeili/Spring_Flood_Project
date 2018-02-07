@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import yuan.flood.dao.Entity.ObservedProperty;
 import yuan.flood.dao.Entity.Sensor;
+import yuan.flood.dao.Entity.SensorObsProperty;
 import yuan.flood.dao.IDao.IObsPropertyDao;
 import yuan.flood.dao.IDao.ISensorDao;
+import yuan.flood.dao.IDao.ISensorObsPropertyDao;
 import yuan.flood.service.IService.ISensorService;
 import yuan.flood.sos.DataTimeSeries;
 import yuan.flood.sos.Decode;
@@ -15,10 +17,7 @@ import yuan.flood.until.HttpMethods;
 import yuan.flood.until.ReadConfig;
 import yuan.flood.until.SOSSESConfig;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Yuan on 2017/1/16.
@@ -35,6 +34,8 @@ public class SensorService implements ISensorService {
     private ISensorDao sensorDao;
     @Autowired
     private IObsPropertyDao obsPropertyDao;
+    @Autowired
+    private ISensorObsPropertyDao sensorObsPropertyDao;
 
     /**
      * get sensors when open the show sensor page
@@ -68,26 +69,87 @@ public class SensorService implements ISensorService {
     @Override
     public void saveSensorsAndObsProperty(List<Sensor> sensors) {
 
+        //已经
+        List<String> hasSavedPropertyID = new ArrayList<>();
+
         try {
-//            Sensor sensor=new Sensor();
-//            sensor.setSensorID("sadas");
-//            sensor.setObservedProperties(new HashSet<ObservedProperty>());
-//            ObservedProperty observedProperty=new ObservedProperty();
-//            observedProperty.setPropertyID("obs");
-//            observedProperty.setSensors(new HashSet<Sensor>());
-//            sensor.getObservedProperties().add(observedProperty);
-//            observedProperty.getSensors().add(sensor);
             for (Sensor sensor:sensors) {
-                sensorDao.saveOrUpdate(sensor);
+                if (isSavedProperty(sensor,hasSavedPropertyID))
+                    sensorDao.merge(sensor);
+                else {
+                    sensorDao.saveOrUpdate(sensor);
+                    for (ObservedProperty observedProperty : sensor.getObservedProperties()) {
+                        hasSavedPropertyID.add(observedProperty.getPropertyID());
+                    }
+                }
             }
-//            sensorDao.save(sensor);
-//            obsPropertyDao.save(observedProperty);
+
+            //存储中间表，获得每个传感器的所有属性
+            List<String> hasSavedSensorPropertyIDs = new ArrayList<>();
+            for (Sensor sensor : sensors) {
+                if (sensor.getObservedProperties()!=null)
+                    for (ObservedProperty property:sensor.getObservedProperties())
+                    {
+                        SensorObsProperty sensorObsProperty = new SensorObsProperty();
+                        sensorObsProperty.setSensorID(sensor.getSensorID());
+                        sensorObsProperty.setObservedPropertyID(property.getPropertyID());
+                        sensorObsProperty.setSensorName(sensor.getSensorName());
+                        sensorObsProperty.setPropertyName(property.getPropertyName());
+
+                        //找表中是否存在这个属性数据
+                        if (!getIsSensorProperty(sensor.getSensorID(), property.getPropertyID())) {
+                            Long Id = getMaxPropertyID();
+                            sensorObsProperty.setId(Id);
+                            sensorObsPropertyDao.saveOrupdate(sensorObsProperty);
+                        }
+
+                    }
+            }
         }catch (Exception e){
 
         }
 
     }
 
+    public boolean isSavedProperty(Sensor sensor,List<String> hasSavedObsID) {
+        for (ObservedProperty observedProperty : sensor.getObservedProperties()) {
+            if (hasSavedObsID.contains(observedProperty.getPropertyID())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Long getMaxPropertyID() {
+        String findCountStr="select count(*) from SensorObsProperty s";
+        String findMaxOrderStr="select max(s.id) from SensorObsProperty s";
+        List<Long> count=sensorObsPropertyDao.find(findCountStr);
+        Long countN=count.get(0);
+        if (countN==0){
+            return 0L;
+        }else {
+            List<Long> maxorder= sensorObsPropertyDao.find(findMaxOrderStr);
+            return maxorder.get(0)+1;
+        }
+    }
+    public boolean getIsSensorProperty(String sensorID, String propertyID) {
+        String countHql = "select count(*) from SensorObsProperty s";
+        String hql = "from SensorObsProperty s where s.sensorID='" + sensorID + "' and s.observedPropertyID='" + propertyID + "'";
+        List<Long> countList = sensorObsPropertyDao.find(countHql);
+        Long count = countList.get(0);
+        if (count==0)
+            return false;
+        try {
+            List result = sensorObsPropertyDao.find(hql);
+            if (result == null || result.isEmpty()) {
+                return false;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+
+        return true;
+    }
    public List<Sensor> findObseredPropertyBySensorID(String sensorID){
        String hql="from Sensor s where s.sensorID='"+sensorID+"'";
        List<Sensor> result=sensorDao.find(hql);

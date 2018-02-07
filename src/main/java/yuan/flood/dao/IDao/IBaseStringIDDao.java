@@ -54,4 +54,6 @@ public interface IBaseStringIDDao<T,PK> {
 
     public void merge(T entity);
 
+    public boolean contain(T entity);
+
 }

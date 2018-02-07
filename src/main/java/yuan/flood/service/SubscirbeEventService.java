@@ -473,8 +473,8 @@ public class SubscirbeEventService implements ISubScribeEventService {
     @Override
     public SubscibeEventParams getEventSpatialArea(SubscibeEventParams subscibeEventParams) {
         List<Sensor> sensorList = getEventSensorList(subscibeEventParams);
-        double maxLat = Double.MIN_VALUE;
-        double maxLon = Double.MIN_VALUE;
+        double maxLat = -Double.MAX_VALUE;
+        double maxLon = -Double.MAX_VALUE;
         double minLat = Double.MAX_VALUE;
         double minLon = Double.MIN_VALUE;
 

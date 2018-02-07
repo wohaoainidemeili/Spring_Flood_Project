@@ -117,6 +117,7 @@ public class DecodeWNSEventService implements IDecodeWNSEventService{
                 if(isEventStatusChanged(message_IdStr[0],message_IdStr[1])) {
                      phaseService= PhaseFactory.createPhaseService(message_IdStr[1]);
                      if (phaseService==null) System.out.println("某服务无法获取");
+                     //状态改变，且当前状态为recovery时，进行事件构建
 
                 }
                 executorService.execute(new Runnable() {

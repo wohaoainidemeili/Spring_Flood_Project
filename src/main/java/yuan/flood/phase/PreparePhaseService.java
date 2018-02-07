@@ -15,6 +15,7 @@ public class PreparePhaseService implements IPhaseService {
         //计算消息内容，发送消息
 
         // 做水位预测，只需要传入自己的观测属性，
+        //根据输入
 
     }
 }

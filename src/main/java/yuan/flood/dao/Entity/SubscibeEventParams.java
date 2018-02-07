@@ -66,7 +66,8 @@ public class SubscibeEventParams {
 
     private String userDefineName;
     private String email;
-
+    //key value字段，用于存储服务的参数配置
+    private String serviceParams;
     private User user;
 
     private Set<DetectedEvent> detectedEvents=new HashSet<DetectedEvent>();
@@ -453,5 +454,13 @@ public class SubscibeEventParams {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getServiceParams() {
+        return serviceParams;
+    }
+
+    public void setServiceParams(String serviceParams) {
+        this.serviceParams = serviceParams;
     }
 }

@@ -9,8 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import yuan.flood.dao.Entity.Sensor;
+import yuan.flood.dao.Entity.SensorObsProperty;
 import yuan.flood.dao.Entity.SubscibeEventParams;
 import yuan.flood.dao.Entity.UIDTO.EventParamsDTO;
+import yuan.flood.dao.Entity.UIDTO.FloodResult;
 import yuan.flood.dao.Entity.UIDTO.SensorSetParamsDTO;
 import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
 import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
@@ -19,6 +21,7 @@ import yuan.flood.dao.Entity.User;
 import yuan.flood.message.MessageRecieveThread;
 import yuan.flood.service.DecodeWNSEventService;
 import yuan.flood.service.IService.IDecodeWNSEventService;
+import yuan.flood.service.IService.ISensorObsPropertyService;
 import yuan.flood.service.IService.ISensorService;
 import yuan.flood.service.IService.ISubScribeEventService;
 import yuan.flood.ses.SESConnector;
@@ -44,6 +47,8 @@ public class RegisterEventController {
     private ISensorService sensorService;
     @Autowired
     private ReadConfig readConfig;
+    @Autowired
+    private ISensorObsPropertyService sensorObsPropertyService;
 
 //    @Autowired
    // private SESConnector sesConnector;
@@ -129,6 +134,37 @@ public class RegisterEventController {
         }
     }
 
+    @CrossOrigin(value = "*")
+    @RequestMapping(value = "/getSelectPropertiesJson ", method = RequestMethod.POST)
+    @ResponseBody
+    public FloodResult<Boolean> getSelectPropertiesJson(HttpServletRequest request, @RequestBody List<SensorObsProperty> properties) {
+        FloodResult<Boolean> floodResult = new FloodResult<>();
+        floodResult.setFlag(true);
+        HttpSession session = request.getSession();
+        if (properties != null && !properties.isEmpty()) {
+            //获取SensorProperty的ID信息
+            List<SensorObsProperty> sensorObsProperties = new ArrayList<>();
+            for (SensorObsProperty sensorObsProperty : properties) {
+                SensorObsProperty fullSensorProperty = sensorObsPropertyService.getSensorPropertyIDBySensor(sensorObsProperty);
+                if (fullSensorProperty==null) {
+                    floodResult.setFlag(false);
+                    floodResult.setMessage("属性设置错误！无法找到对应的传感器属性！");
+                    floodResult.setObject(false);
+                    return floodResult;
+                }else {
+                    sensorObsProperties.add(fullSensorProperty);
+                }
+            }
+            session.removeAttribute(SessionNames.SELECT_PROPERTYIES);
+            session.setAttribute(SessionNames.SELECT_PROPERTYIES,sensorObsProperties);
+            return floodResult;
+        } else {
+            floodResult.setFlag(false);
+            floodResult.setMessage("属性错误！属性集不可为空！");
+            floodResult.setObject(false);
+            return floodResult;
+        }
+    }
     /**
      * 用于生成React订阅界面的Json数据，实时更新
      */
@@ -146,6 +182,7 @@ public class RegisterEventController {
         HttpSession session=request.getSession();
         String[] sensorIDs= (String[]) session.getAttribute("selectSensors");
         SubscibeEventParams subscibeEventParams = (SubscibeEventParams) session.getAttribute(SessionNames.SETTED_EVENT_PARAMS);
+        List<SensorObsProperty> sensorObsProperties = (List<SensorObsProperty>) session.getAttribute(SessionNames.SELECT_PROPERTYIES);
 
         if (sensorIDs==null||sensorIDs.length==0) {
             subscribeParamsDTO.setDataset(sensorSetParamsDTO);

@@ -1,5 +1,12 @@
 package yuan.flood.dao.Entity.UIEntity;
 
+import yuan.flood.dao.Entity.SensorObsProperty;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class SubscribeEventParamsDTO {
     private String eventID;
     //for create the name of subevent in current event
@@ -48,7 +55,6 @@ public class SubscribeEventParamsDTO {
     private Integer recoveryRepeatTimes;
     private Double recoveryThreshold;
     private String recoveryUnit;
-
     //after subscribe the event we get eventSesID
     private String eventSesID;
 
@@ -60,6 +66,10 @@ public class SubscribeEventParamsDTO {
 
     private String userDefineName;
     private String email;
+
+    // 服务参数
+    private List<SensorObsProperty> sensorObsPropertyList = new ArrayList<>();
+    private Map<String, String> map = new HashMap<>();
 
     public String getUserDefineName() {
         return userDefineName;

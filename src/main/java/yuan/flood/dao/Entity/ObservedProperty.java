@@ -13,6 +13,8 @@ public class ObservedProperty implements Serializable {
     private String propertyName;
     private String unit;
     private Set<Sensor> sensors=new HashSet<Sensor>();
+    //1对多的
+    private Set<SensorObsProperty> sensorObsProperties = new HashSet<>();
 
     public String getPropertyName() {
         return propertyName;
@@ -44,5 +46,13 @@ public class ObservedProperty implements Serializable {
 
     public void setSensors(Set<Sensor> sensors) {
         this.sensors = sensors;
+    }
+
+    public Set<SensorObsProperty> getSensorObsProperties() {
+        return sensorObsProperties;
+    }
+
+    public void setSensorObsProperties(Set<SensorObsProperty> sensorObsProperties) {
+        this.sensorObsProperties = sensorObsProperties;
     }
 }

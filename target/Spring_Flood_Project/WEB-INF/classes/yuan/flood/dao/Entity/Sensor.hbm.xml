@@ -10,7 +10,7 @@
         <property name="sensorName" type="java.lang.String" column="sensorName"></property>
         <property name="lat" type="java.lang.Double" column="latitude"></property>
         <property name="lon" type="java.lang.Double" column="lontitude"></property>
-        <set name="observedProperties" inverse="false" cascade="save-update" table="sensor_obs" lazy="false">
+        <set name="observedProperties" inverse="false" cascade="all" table="sensor_obs" lazy="false">
             <key column="sensor_id"></key>
             <many-to-many class="ObservedProperty" column="obs_id"/>
         </set>

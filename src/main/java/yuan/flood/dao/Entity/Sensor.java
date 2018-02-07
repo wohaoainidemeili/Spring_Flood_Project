@@ -13,6 +13,8 @@ public class Sensor {
     private double lat;
     private double lon;
     private Set<ObservedProperty> observedProperties=new HashSet<ObservedProperty>();
+    //1对多的传感器中间表
+    private Set<SensorObsProperty> sensorObsProperties = new HashSet<>();
 
     public String getSensorID() {
         return sensorID;
@@ -52,5 +54,13 @@ public class Sensor {
 
     public void setObservedProperties(Set<ObservedProperty> observedProperties) {
         this.observedProperties = observedProperties;
+    }
+
+    public Set<SensorObsProperty> getSensorObsProperties() {
+        return sensorObsProperties;
+    }
+
+    public void setSensorObsProperties(Set<SensorObsProperty> sensorObsProperties) {
+        this.sensorObsProperties = sensorObsProperties;
     }
 }

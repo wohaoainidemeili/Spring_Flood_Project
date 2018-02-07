@@ -1,6 +1,7 @@
 package yuan.flood.dao;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
@@ -34,9 +35,9 @@ public class BaseDaoImpl<T extends Serializable,PK extends Serializable> extends
         }
     }
 
+    @Autowired
+    @Qualifier("mysessionFactory")
     @Override
-    //@Resource(name="mysessionFatory")
-    @Autowired@Qualifier("mysessionFactory")
     public void setSuperSessionFactory(SessionFactory sessionFactory) {
         super.setSessionFactory(sessionFactory);
     }
@@ -78,6 +79,22 @@ public class BaseDaoImpl<T extends Serializable,PK extends Serializable> extends
         getHibernateTemplate().saveOrUpdate(entity);
         getHibernateTemplate().getSessionFactory().getCurrentSession().getTransaction().commit();
         getHibernateTemplate().getSessionFactory().getCurrentSession().beginTransaction();
+    }
+
+    @Override
+    public void saveOrupdate(T entity) {
+//        Transaction transaction = getHibernateTemplate().getSessionFactory().getCurrentSession().getTransaction();
+        getHibernateTemplate().saveOrUpdate(entity);
+//        if (transaction != null && !transaction.wasCommitted() && !transaction.wasRolledBack() && transaction.isActive()) {
+//            transaction.commit();
+//        }
+//        transaction.begin();
+    }
+
+    @Override
+    public void merge(T entity) {
+        getHibernateTemplate().merge(entity);
+
     }
 
 }

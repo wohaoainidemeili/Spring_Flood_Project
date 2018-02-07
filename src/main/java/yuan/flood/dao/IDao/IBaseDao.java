@@ -62,4 +62,7 @@ public interface IBaseDao <T extends Serializable,PK extends Serializable> {
      */
     public void saveOrUpdate(T entity);
 
+    public void saveOrupdate(T entity);
+
+    public void merge(T entity);
 }

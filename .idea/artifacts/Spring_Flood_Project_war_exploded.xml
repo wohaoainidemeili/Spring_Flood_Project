@@ -7,6 +7,8 @@
           <element id="module-output" name="Spring_Flood_Project" />
         </element>
         <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: javax.mail:mail:1.4" />
+          <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
           <element id="library" level="project" name="Maven: org.geotools:gt-main:18.0" />
           <element id="library" level="project" name="Maven: org.geotools:gt-api:18.0" />
           <element id="library" level="project" name="Maven: org.geotools:gt-referencing:18.0" />
