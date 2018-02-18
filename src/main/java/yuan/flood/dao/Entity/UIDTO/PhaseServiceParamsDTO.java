@@ -12,6 +12,31 @@ import java.util.Map;
  * 阶段服务配置参数
  */
 public class PhaseServiceParamsDTO {
-    Map<String, String> params = new HashMap<>();
-    List<SensorObsProperty> selectedSensor = new ArrayList<>();
+    private boolean flag;
+    private List<SensorObsProperty> selectedProperty = new ArrayList<>();
+    private Map<String, String> otherParams = new HashMap<>();
+
+    public boolean isFlag() {
+        return flag;
+    }
+
+    public void setFlag(boolean flag) {
+        this.flag = flag;
+    }
+
+    public List<SensorObsProperty> getSelectedProperty() {
+        return selectedProperty;
+    }
+
+    public void setSelectedProperty(List<SensorObsProperty> selectedProperty) {
+        this.selectedProperty = selectedProperty;
+    }
+
+    public Map<String, String> getOtherParams() {
+        return otherParams;
+    }
+
+    public void setOtherParams(Map<String, String> otherParams) {
+        this.otherParams = otherParams;
+    }
 }

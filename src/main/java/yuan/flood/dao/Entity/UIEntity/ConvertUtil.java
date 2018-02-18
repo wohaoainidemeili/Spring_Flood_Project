@@ -6,6 +6,7 @@ import yuan.flood.dao.Entity.SubscibeEventParams;
 import yuan.flood.dao.Entity.UIDTO.EventPhaseDTO;
 import yuan.flood.dao.Entity.UIDTO.EventSensorPropertyDTO;
 import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
+import yuan.flood.until.FeatureUtil;
 
 import java.util.*;
 
@@ -96,13 +97,71 @@ public class ConvertUtil {
         subscribeEventParamsDTO.setEmail(subscibeEventParams.getEmail());
 
         subscribeEventParamsDTO.setUserDefineName(subscibeEventParams.getUserDefineName());
+        subscribeEventParamsDTO.setFeatureMap(FeatureUtil.getFeatureFromString(subscibeEventParams.getFeatureString()));
 
         return subscribeEventParamsDTO;
 
     }
 
     public static SubscibeEventParams getSubscibeEventParamsfromSubscribeEventParamsDTO(SubscribeEventParamsDTO subscribeEventParamsDTO) {
-        return new SubscibeEventParams();
+        SubscibeEventParams subscibeEventParams = new SubscibeEventParams();
+       if (subscribeEventParamsDTO==null) return subscibeEventParams;
+        subscibeEventParams.setDiagnosisDay(subscribeEventParamsDTO.getDiagnosisDay());
+        subscibeEventParams.setDiagnosisHour(subscribeEventParamsDTO.getPrepareHour());
+        subscibeEventParams.setDiagnosisMinute(subscribeEventParamsDTO.getDiagnosisMinute());
+        subscibeEventParams.setDiagnosisObservation(subscribeEventParamsDTO.getDiagnosisObservation());
+        subscibeEventParams.setDiagnosisRepeatTimes(subscribeEventParamsDTO.getDiagnosisRepeatTimes());
+        subscibeEventParams.setDiagnosisSecond(subscribeEventParamsDTO.getDiagnosisSecond());
+        subscibeEventParams.setDiagnosisSensor(subscribeEventParamsDTO.getDiagnosisSensor());
+        subscibeEventParams.setDiagnosisThreshold(subscribeEventParamsDTO.getDiagnosisThreshold());
+        subscibeEventParams.setDiagnosisUnit(subscribeEventParamsDTO.getDiagnosisUnit());
+
+        subscibeEventParams.setEventID(subscribeEventParamsDTO.getEventID());
+        subscibeEventParams.setEventName(subscribeEventParamsDTO.getEventName());
+        subscibeEventParams.setEventSesID(subscribeEventParamsDTO.getEventSesID());
+        subscibeEventParams.setOrder(subscribeEventParamsDTO.getOrder());
+
+        subscibeEventParams.setPrepareDay(subscribeEventParamsDTO.getPrepareDay());
+        subscibeEventParams.setPrepareHour(subscribeEventParamsDTO.getPrepareHour());
+        subscibeEventParams.setPrepareMinute(subscribeEventParamsDTO.getPrepareMinute());
+        subscibeEventParams.setPrepareObservation(subscribeEventParamsDTO.getPrepareObservation());
+        subscibeEventParams.setPrepareRepeatTimes(subscribeEventParamsDTO.getPrepareRepeatTimes());
+        subscibeEventParams.setPrepareSecond(subscribeEventParamsDTO.getPrepareSecond());
+        subscibeEventParams.setPrepareSensor(subscribeEventParamsDTO.getPrepareSensor());
+        subscibeEventParams.setPrepareThreshold(subscribeEventParamsDTO.getPrepareThreshold());
+        subscibeEventParams.setPrepareUnit(subscribeEventParamsDTO.getPrepareUnit());
+
+        subscibeEventParams.setRecoveryDay(subscribeEventParamsDTO.getRecoveryDay());
+        subscibeEventParams.setRecoveryHour(subscribeEventParamsDTO.getRecoveryHour());
+        subscibeEventParams.setRecoveryMinute(subscribeEventParamsDTO.getRecoveryMinute());
+        subscibeEventParams.setRecoveryObservation(subscribeEventParamsDTO.getRecoveryObservation());
+        subscibeEventParams.setRecoveryRepeatTimes(subscribeEventParamsDTO.getRecoveryRepeatTimes());
+        subscibeEventParams.setRecoverySecond(subscribeEventParamsDTO.getRecoverySecond());
+        subscibeEventParams.setRecoverySensor(subscribeEventParamsDTO.getRecoverySensor());
+        subscibeEventParams.setRecoveryThreshold(subscribeEventParamsDTO.getRecoveryThreshold());
+        subscibeEventParams.setRecoveryUnit(subscibeEventParams.getDiagnosisUnit());
+
+        subscibeEventParams.setResponseDay(subscribeEventParamsDTO.getResponseDay());
+        subscibeEventParams.setResponseHour(subscribeEventParamsDTO.getResponseHour());
+        subscibeEventParams.setResponseMinute(subscribeEventParamsDTO.getResponseMinute());
+        subscibeEventParams.setResponseObservation(subscribeEventParamsDTO.getResponseObservation());
+        subscibeEventParams.setResponseRepeatTimes(subscribeEventParamsDTO.getResponseRepeatTimes());
+        subscibeEventParams.setResponseSecond(subscribeEventParamsDTO.getResponseSecond());
+        subscibeEventParams.setResponseSensor(subscribeEventParamsDTO.getResponseSensor());
+        subscibeEventParams.setResponseThreshold(subscribeEventParamsDTO.getResponseThreshold());
+        subscibeEventParams.setResponseUnit(subscribeEventParamsDTO.getResponseUnit());
+
+        subscibeEventParams.setMaxLat(subscribeEventParamsDTO.getMaxLat());
+        subscibeEventParams.setMaxLon(subscribeEventParamsDTO.getMaxLon());
+        subscibeEventParams.setMinLat(subscribeEventParamsDTO.getMinLat());
+        subscibeEventParams.setMinLon(subscribeEventParamsDTO.getMinLon());
+        subscibeEventParams.setEmail(subscribeEventParamsDTO.getEmail());
+
+        subscibeEventParams.setUserDefineName(subscribeEventParamsDTO.getUserDefineName());
+        String stringFromList = FeatureUtil.getStringFromList(subscribeEventParamsDTO.getSensorPropertyIDs());
+        subscribeEventParamsDTO.getFeatureMap().put(SubscribeEventParamsDTO.SENSOR_PROPERTY_IDS, stringFromList);
+        subscibeEventParams.setFeatureString(FeatureUtil.getStringFromFeature(subscribeEventParamsDTO.getFeatureMap()));
+        return subscibeEventParams;
     }
 
     public static EventSensorPropertyDTO getEventSensorPropertyDTOFromSensorAndProperty(Sensor sensor, ObservedProperty property) {

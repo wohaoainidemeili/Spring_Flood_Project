@@ -70,6 +70,7 @@ public class SubscibeEventParams {
     private String serviceParams;
     private User user;
 
+    private String featureString;
     private Set<DetectedEvent> detectedEvents=new HashSet<DetectedEvent>();
 
     public String getUserDefineName() {
@@ -462,5 +463,13 @@ public class SubscibeEventParams {
 
     public void setServiceParams(String serviceParams) {
         this.serviceParams = serviceParams;
+    }
+
+    public String getFeatureString() {
+        return featureString;
+    }
+
+    public void setFeatureString(String featureString) {
+        this.featureString = featureString;
     }
 }

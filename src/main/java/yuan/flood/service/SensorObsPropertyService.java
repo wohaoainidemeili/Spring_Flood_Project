@@ -18,6 +18,21 @@ public class SensorObsPropertyService implements ISensorObsPropertyService {
     }
 
     @Override
+    public SensorObsProperty getSensorPropertyByID(Long id) {
+        String countHql = "select count(*) from SensorObsProperty s";
+        String hql = "from SensorObsProperty s where s.id=" + id;
+        List countList = sensorObsPropertyDao.find(countHql);
+        Long count = (Long) countList.get(0);
+        if (count!=0) {
+            List result = sensorObsPropertyDao.find(hql);
+            if (result != null &&!result.isEmpty()) {
+                return (SensorObsProperty) result.get(0);
+            }
+        }
+        return null;
+    }
+
+    @Override
     public SensorObsProperty getSensorPropertyIDBySensor(SensorObsProperty sensorObsProperty) {
         String countHql = "select count(*) from SensorObsProperty s";
         String hql = "from SensorObsProperty s where s.sensorID='" + sensorObsProperty.getSensorID() + "' and s.observedPropertyID='" + sensorObsProperty.getObservedPropertyID() + "'";

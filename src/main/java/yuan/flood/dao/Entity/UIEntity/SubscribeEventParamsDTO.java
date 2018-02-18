@@ -1,6 +1,7 @@
 package yuan.flood.dao.Entity.UIEntity;
 
 import yuan.flood.dao.Entity.SensorObsProperty;
+import yuan.flood.until.FeatureUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public class SubscribeEventParamsDTO {
+    public final static String SENSOR_PROPERTY_IDS = "SensorPropertyIDs";
+    public final static String EMAIL_ADDRESS = "EmailAddress";
     private String eventID;
     //for create the name of subevent in current event
     private Long order;
@@ -68,8 +71,8 @@ public class SubscribeEventParamsDTO {
     private String email;
 
     // 服务参数
-    private List<SensorObsProperty> sensorObsPropertyList = new ArrayList<>();
-    private Map<String, String> map = new HashMap<>();
+    private List<String> sensorPropertyIDs = new ArrayList<>();
+    private Map<String, String> featureMap = new HashMap<>();
 
     public String getUserDefineName() {
         return userDefineName;
@@ -438,4 +441,26 @@ public class SubscribeEventParamsDTO {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    public List<String> getSensorPropertyIDs() {
+        //从Map中获取
+        String IDStr = this.featureMap.get(SENSOR_PROPERTY_IDS);
+        List<String> idList = FeatureUtil.getListFromString(IDStr);
+        return idList;
+    }
+
+    public void setSensorPropertyIDs(List<String> sensorPropertyIDs) {
+        this.sensorPropertyIDs = sensorPropertyIDs;
+        String stringFromList = FeatureUtil.getStringFromList(sensorPropertyIDs);
+        this.featureMap.put(SENSOR_PROPERTY_IDS, stringFromList);
+    }
+
+    public Map<String, String> getFeatureMap() {
+        return featureMap;
+    }
+
+    public void setFeatureMap(Map<String, String> featureMap) {
+        this.featureMap = featureMap;
+    }
+
 }

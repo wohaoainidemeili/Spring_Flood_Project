@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import yuan.flood.dao.Entity.Sensor;
 import yuan.flood.dao.Entity.SensorObsProperty;
 import yuan.flood.dao.Entity.SubscibeEventParams;
-import yuan.flood.dao.Entity.UIDTO.EventParamsDTO;
-import yuan.flood.dao.Entity.UIDTO.FloodResult;
-import yuan.flood.dao.Entity.UIDTO.SensorSetParamsDTO;
-import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
+import yuan.flood.dao.Entity.UIDTO.*;
 import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
 import yuan.flood.dao.Entity.UIEntity.SensorDTO;
 import yuan.flood.dao.Entity.User;
@@ -33,10 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Yuan on 2017/1/12.
@@ -177,6 +171,7 @@ public class RegisterEventController {
         SubscribeParamsDTO subscribeParamsDTO=new SubscribeParamsDTO();
         SensorSetParamsDTO sensorSetParamsDTO=new SensorSetParamsDTO();
         EventParamsDTO eventParamsDTO=new EventParamsDTO();
+        PhaseServiceParamsDTO phaseServiceParamsDTO = new PhaseServiceParamsDTO();
 
         //如果session缓存中不包含选中的传感器ID，直接返回结果
         HttpSession session=request.getSession();
@@ -187,6 +182,7 @@ public class RegisterEventController {
         if (sensorIDs==null||sensorIDs.length==0) {
             subscribeParamsDTO.setDataset(sensorSetParamsDTO);
             subscribeParamsDTO.setEvent(eventParamsDTO);
+            subscribeParamsDTO.setService(phaseServiceParamsDTO);
             return subscribeParamsDTO;
         }
         //如果当前包含sensors的缓存，则进行数据的修改
@@ -209,6 +205,7 @@ public class RegisterEventController {
        if (subscibeEventParams==null){
            subscribeParamsDTO.setDataset(sensorSetParamsDTO);
            subscribeParamsDTO.setEvent(eventParamsDTO);
+           subscribeParamsDTO.setService(phaseServiceParamsDTO);
            return subscribeParamsDTO;
        }
 
@@ -216,8 +213,21 @@ public class RegisterEventController {
         eventParamsDTO.setFlag(true);
         eventParamsDTO.setParams(ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(subscibeEventParams));
 
+        //查询服务参数配置中，选中的传感器是否为空
+        if (sensorObsProperties == null || sensorObsProperties.isEmpty()) {
+            subscribeParamsDTO.setDataset(sensorSetParamsDTO);
+            subscribeParamsDTO.setEvent(eventParamsDTO);
+            subscribeParamsDTO.setService(phaseServiceParamsDTO);
+            return subscribeParamsDTO;
+        }
+        //加载服务参数部分
+        phaseServiceParamsDTO.setFlag(true);
+        phaseServiceParamsDTO.setSelectedProperty(sensorObsProperties);
+        phaseServiceParamsDTO.setOtherParams(new HashMap<>());
+
         subscribeParamsDTO.setDataset(sensorSetParamsDTO);
         subscribeParamsDTO.setEvent(eventParamsDTO);
+        subscribeParamsDTO.setService(phaseServiceParamsDTO);
         return subscribeParamsDTO;
     }
 

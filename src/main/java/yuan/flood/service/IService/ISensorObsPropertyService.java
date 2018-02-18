@@ -8,6 +8,8 @@ public interface ISensorObsPropertyService {
     //输入多个id，找到对应的属性
     public List getSensorPropertyList(List<Long> ids);
 
+    public SensorObsProperty getSensorPropertyByID(Long id);
+
     public SensorObsProperty getSensorPropertyIDBySensor(SensorObsProperty sensorObsProperty);
 
     public boolean getIsSensorProperty(String sensorID, String propertyID);

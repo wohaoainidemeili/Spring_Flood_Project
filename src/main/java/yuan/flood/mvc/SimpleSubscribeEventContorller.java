@@ -203,11 +203,17 @@ public class SimpleSubscribeEventContorller {
     @CrossOrigin(value = "*")
     @RequestMapping(method = RequestMethod.POST, value = "/subscribeWithSession")
     @ResponseBody
-    public FloodResult<String> getSubscribeEventRegiistered(HttpServletRequest request, @RequestBody SubscibeEventParams params) {
+    public FloodResult<String> getSubscribeEventRegiistered(HttpServletRequest request, @RequestBody SubscribeEventParamsDTO params) {
 //        SubscibeEventParams subscibeEventParams = ConvertUtil.getSubscibeEventParamsfromSubscribeEventParamsDTO(params);
         FloodResult<String> floodResult = new FloodResult<String>();
         floodResult.setFlag(true);
-        String sesID = sesConnector.subscribeEvent(subscirbeEventService.createSubscirbeEvent(params));
+        if (params==null){
+            floodResult.setFlag(false);
+            floodResult.setMessage("当前事件参数为空！");
+            return floodResult;
+        }
+        SubscibeEventParams subscibeEventParams = ConvertUtil.getSubscibeEventParamsfromSubscribeEventParamsDTO(params);
+        String sesID = sesConnector.subscribeEvent(subscirbeEventService.createSubscirbeEvent(subscibeEventParams));
         if (Strings.isNullOrEmpty(sesID)) {
             floodResult.setFlag(false);
              floodResult.setMessage("事件注册异常！");
@@ -215,19 +221,21 @@ public class SimpleSubscribeEventContorller {
         }
 
         //计算最大最小的空间范围
-        subscirbeEventService.getEventSpatialArea(params);
+        subscirbeEventService.getEventSpatialArea(subscibeEventParams);
 
         //注册完成后入库，清理缓存
-        params.setEventSesID(sesID);
+        subscibeEventParams.setEventSesID(sesID);
         Long ID= eventService.getMaxEventOrder();
-        params.setOrder(ID);
-        params.setEventID("Event"+ID);
+        subscibeEventParams.setOrder(ID);
+        subscibeEventParams.setEventID("Event"+ID);
 //        params.setEventName("Event"+ID);
-        eventService.saveSubscribeEvent(params);
+        eventService.saveSubscribeEvent(subscibeEventParams);
 
         HttpSession session = request.getSession();
         session.removeAttribute(SessionNames.SELECT_SENSORS);
         session.removeAttribute(SessionNames.SETTED_EVENT_PARAMS);
+        session.removeAttribute(SessionNames.SELECT_PROPERTYIES);
+
         floodResult.setObject(sesID);
         return floodResult;
     }

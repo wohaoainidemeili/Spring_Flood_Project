@@ -1,11 +1,12 @@
 package yuan.flood.dao.Entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 记录一次事件
  */
-public class DetectedFullEvent {
+public class DetectedFullEvent implements Serializable {
     private Long id;
     /**
      * 这次事件的开始时间点
