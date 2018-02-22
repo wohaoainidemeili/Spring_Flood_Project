@@ -938,7 +938,7 @@
       <workItem from="1517721893890" duration="16762000" />
       <workItem from="1517896720854" duration="43955000" />
       <workItem from="1518325139774" duration="22129000" />
-      <workItem from="1518935980265" duration="29963000" />
+      <workItem from="1518935980265" duration="29975000" />
     </task>
     <task id="LOCAL-00001" summary="创建适合Ant design前端的后端项目">
       <created>1514558127429</created>
@@ -975,11 +975,18 @@
       <option name="project" value="LOCAL" />
       <updated>1518983582402</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="完成事件完整探测，与事件准备阶段处理，即水位预测服务">
+      <created>1519263319310</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1519263319310</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1130295000" />
+    <option name="totallyTimeSpent" value="1130307000" />
   </component>
   <component name="TodoView" selected-index="2">
     <todo-panel id="selected-file">
