@@ -8,7 +8,6 @@ import java.util.Set;
  * Created by Yuan on 2017/1/15.
  */
 public class ObservedProperty implements Serializable {
-
     private String propertyID;
     private String propertyName;
     private String unit;

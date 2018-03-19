@@ -11,7 +11,7 @@
         <property name="startTime" type="java.util.Date" column="startTime"></property>
         <property name="endTime" type="java.util.Date" column="endTime"></property>
         <property name="diagnosisStartTime" type="java.util.Date" column="diagnosisStartTime"></property>
-        <property name="prepareStartTime" type="java.util.Date" column="endTimeLong"></property>
+        <property name="prepareStartTime" type="java.util.Date" column="prepareStartTime"></property>
         <property name="responseStartTime" type="java.util.Date" column="responseStartTime"></property>
         <property name="recoveryStartTime" type="java.util.Date" column="recoveryStartTime"></property>
         <property name="recoveryEndTime" type="java.util.Date" column="recoveryEndTime"></property>

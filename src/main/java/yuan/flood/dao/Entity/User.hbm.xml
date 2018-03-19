@@ -9,5 +9,6 @@
         </id>
         <property name="userID" type="java.lang.String" column="user_id"></property>
         <property name="passWord" type="java.lang.String" column="password"></property>
+        <property name="emailAddress" type="java.lang.String" column="email_address"></property>
     </class>
 </hibernate-mapping>

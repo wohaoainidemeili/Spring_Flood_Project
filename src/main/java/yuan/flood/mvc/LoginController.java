@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import yuan.flood.dao.Entity.DetectedEvent;
+import yuan.flood.dao.Entity.PredictWaterLevelResult;
 import yuan.flood.dao.Entity.User;
 import yuan.flood.dao.IDao.IDetectedEventDao;
+import yuan.flood.dao.IDao.IPredictWaterLevelResultDao;
 import yuan.flood.dao.IDao.IUserDao;
 import yuan.flood.service.IService.IDecodeWNSEventService;
+import yuan.flood.service.IService.IPredictWaterLevelService;
 import yuan.flood.service.IService.IUserService;
 import yuan.flood.service.DecodeWNSEventService;
 
@@ -20,6 +23,8 @@ import java.util.List;
 public class LoginController {
 	@Autowired
 	private IUserService userService;
+	@Autowired
+	private IPredictWaterLevelService predictWaterLevelService;
 	@Autowired
 	private IDecodeWNSEventService decodeWNSEventService;
 	@RequestMapping(value = "/login",method = RequestMethod.GET)
@@ -34,6 +39,11 @@ public class LoginController {
 		user.setUserID("sasa");
 		user.setPassWord("sad");
 		userService.saveUser(user);
+//		PredictWaterLevelResult predictWaterLevelResult = new PredictWaterLevelResult();
+//		predictWaterLevelResult.setTimeLonMatrixStr("1");
+//		predictWaterLevelService.savePredictWaterLevelResult(predictWaterLevelResult);
+//		PredictWaterLevelResult predictWaterLevelResults= predictWaterLevelService.getPredictWaterLevelResultByTest("from PredictWaterLevelResult p where p.timeLonMatrixStr='1'");
+
 		return "/access";
 	}
 	@RequestMapping(value = "/check",method = RequestMethod.POST)
