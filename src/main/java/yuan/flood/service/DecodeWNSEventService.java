@@ -137,16 +137,24 @@ public class DecodeWNSEventService implements IDecodeWNSEventService{
                      phaseService= PhaseFactory.createPhaseService(message_IdStr[1]);
                      if (phaseService==null) System.out.println("某服务无法获取");
                      //状态改变，且当前状态为recovery时，进行事件构建,并存储事件
-                    if (DIAGNOSIS_TYPE.equals(lastEventType)&&message_IdStr[1].equals("recovery")) {
+                    if (RECOVERY_TYPE.equals(lastEventType)&&DIAGNOSIS_TYPE.equals(message_IdStr[1])) {
                         DetectedFullEvent detectedFullEvent = lastestFullEvent.get(message_IdStr[0]);
                         detectedFullEventDao.save(detectedFullEvent);
+                        //统计恢复阶段的数据信息`
+                        executorService.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                phaseService.executeService(RECOVERY_TYPE, endDate,detectedFullEvent);
+                            }
+                        });
                     }
 
                 }
+                if (message_IdStr[1].equals(PREPARE_TYPE)||message_IdStr[1].equals(RESPONSE_TYPE)||message_IdStr[1].equals(DIAGNOSIS_TYPE))
                 executorService.execute(new Runnable() {
                         @Override
                         public void run() {
-                            phaseService.executeService(message_IdStr[0],endDate);
+                            phaseService.executeService(message_IdStr[0],endDate,new Object());
                         }
                     });
 

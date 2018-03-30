@@ -98,6 +98,11 @@ public class ConvertUtil {
 
         subscribeEventParamsDTO.setUserDefineName(subscibeEventParams.getUserDefineName());
         subscribeEventParamsDTO.setFeatureMap(FeatureUtil.getFeatureFromString(subscibeEventParams.getFeatureString()));
+        Map feature= subscribeEventParamsDTO.getFeatureMap();
+        //计算sensorIDs并设置
+        String sensorIDStrings = (String) feature.get(SubscribeEventParamsDTO.SENSOR_PROPERTY_IDS);
+        List<String> listFromString = FeatureUtil.getListFromString(sensorIDStrings);
+        subscribeEventParamsDTO.setSensorPropertyIDs(listFromString);
 
         return subscribeEventParamsDTO;
 

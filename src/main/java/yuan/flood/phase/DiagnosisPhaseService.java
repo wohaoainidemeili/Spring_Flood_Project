@@ -6,7 +6,7 @@ import java.util.Date;
 public class DiagnosisPhaseService implements IPhaseService{
 
     @Override
-    public void executeService(String sesID, Date date) {
+    public void executeService(String sesID, Date date,Object object) {
         //do nothing
     }
 }

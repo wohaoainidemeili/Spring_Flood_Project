@@ -444,15 +444,16 @@ public class SubscribeEventParamsDTO {
 
     public List<String> getSensorPropertyIDs() {
         //从Map中获取
-        String IDStr = this.featureMap.get(SENSOR_PROPERTY_IDS);
-        List<String> idList = FeatureUtil.getListFromString(IDStr);
-        return idList;
+//        String IDStr = this.featureMap.get(SENSOR_PROPERTY_IDS);
+//        List<String> idList = FeatureUtil.getListFromString(IDStr);
+//        return idList;
+        return sensorPropertyIDs;
     }
 
     public void setSensorPropertyIDs(List<String> sensorPropertyIDs) {
         this.sensorPropertyIDs = sensorPropertyIDs;
-        String stringFromList = FeatureUtil.getStringFromList(sensorPropertyIDs);
-        this.featureMap.put(SENSOR_PROPERTY_IDS, stringFromList);
+//        String stringFromList = FeatureUtil.getStringFromList(sensorPropertyIDs);
+//        this.featureMap.put(SENSOR_PROPERTY_IDS, stringFromList);
     }
 
     public Map<String, String> getFeatureMap() {

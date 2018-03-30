@@ -3,14 +3,17 @@ package yuan.flood.phase;
 import org.apache.xmlbeans.XmlException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import yuan.flood.dao.Entity.AlertFloodResult;
 import yuan.flood.dao.Entity.PredictWaterLevelResult;
 import yuan.flood.dao.Entity.SensorObsProperty;
 import yuan.flood.dao.Entity.SubscibeEventParams;
 import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
 import yuan.flood.dao.Entity.UIEntity.SubscribeEventParamsDTO;
+import yuan.flood.dao.IDao.IAlertFloodDao;
 import yuan.flood.dao.IDao.IPredictWaterLevelResultDao;
 import yuan.flood.phase.function.BpDeep;
 import yuan.flood.phase.function.Normalization;
+import yuan.flood.phase.function.SendMail;
 import yuan.flood.service.IService.IEventService;
 import yuan.flood.service.IService.ISensorObsPropertyService;
 import yuan.flood.service.IService.ISensorService;
@@ -21,6 +24,8 @@ import yuan.flood.until.FeatureUtil;
 import yuan.flood.until.HttpMethods;
 import yuan.flood.until.SOSSESConfig;
 
+import javax.mail.MessagingException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -39,9 +44,11 @@ public class PreparePhaseService implements IPhaseService {
     private Decode decode;
     @Autowired
     private IPredictWaterLevelResultDao predictWaterLevelResultDao;
+    @Autowired
+    private IAlertFloodDao alertFloodDao;
 
     @Override
-    public void executeService(String sesID,Date date) {
+    public void executeService(String sesID,Date date,Object object) {
         //得到参数
         SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsByEventSesID(sesID);
 
@@ -149,6 +156,34 @@ public class PreparePhaseService implements IPhaseService {
         //将预测结果存储到数据库中
         predictWaterLevelResultDao.save(predictWaterLevelResult);
 
+        //生成预警消息内容，并将预警消息存储到数据库中
+        AlertFloodResult alertFloodResult = new AlertFloodResult();
+        alertFloodResult.setTime(date);
+        alertFloodResult.setSubscibeEventParams(subscibeEventParams);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        String dateStr = simpleDateFormat.format(date);
+        try {
+            //create message
+            StringBuffer message = new StringBuffer();
+            message.append("您订阅的事件" + subscibeEventParams.getEventID() + "于" + dateStr + "进入准备阶段。\r\n");
+            message.append("该事件的" + subscibeEventParams.getPrepareSensor() + "传感器观测值ֵ");
+            message.append("在" + subscibeEventParams.getPrepareDay() + "天");
+            message.append(subscibeEventParams.getPrepareHour() + "时");
+            message.append(subscibeEventParams.getPrepareMinute() + "分");
+            message.append(subscibeEventParams.getDiagnosisSecond() + "秒");
+            message.append("内大于" + subscibeEventParams.getPrepareThreshold() + "m");
+            message.append("出现次数超过" + subscibeEventParams.getPrepareRepeatTimes() + "次");
+            message.append("该水位站点预测水位未来两天结果为" + predictWaterLevelResult.getPredictResultMatrixStr());
+            alertFloodResult.setMessage(message.toString());
+            //email发送消息内容
+            SendMail.send("wenying3413ying@126.com", "dwytam1314", subscibeEventParams.getEmail(), subscibeEventParams.getEventName() + "事件进入准备阶段", message.toString());
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+        //发送完数据，将信息写入
+        alertFloodDao.save(alertFloodResult);
     }
 
     /**
