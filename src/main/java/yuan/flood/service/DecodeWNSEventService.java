@@ -150,6 +150,9 @@ public class DecodeWNSEventService implements IDecodeWNSEventService{
                     }
 
                 }
+                //未加载服务时直接返回
+                if (phaseService==null) return;
+
                 if (message_IdStr[1].equals(PREPARE_TYPE)||message_IdStr[1].equals(RESPONSE_TYPE)||message_IdStr[1].equals(DIAGNOSIS_TYPE))
                 executorService.execute(new Runnable() {
                         @Override
@@ -199,7 +202,7 @@ public class DecodeWNSEventService implements IDecodeWNSEventService{
         if (eventIDs==null||eventIDs.isEmpty()){
             return true;
         }
-        if (!eventIDs.contains(eventIDs)) {
+        if (!eventIDs.contains(sesID)) {
             return true;
         }
         //当包含该事件时，查看状态是否改变，并更新状态

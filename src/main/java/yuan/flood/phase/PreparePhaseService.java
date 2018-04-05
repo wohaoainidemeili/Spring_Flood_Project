@@ -7,16 +7,16 @@ import yuan.flood.dao.Entity.AlertFloodResult;
 import yuan.flood.dao.Entity.PredictWaterLevelResult;
 import yuan.flood.dao.Entity.SensorObsProperty;
 import yuan.flood.dao.Entity.SubscibeEventParams;
-import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
 import yuan.flood.dao.Entity.UIEntity.SubscribeEventParamsDTO;
 import yuan.flood.dao.IDao.IAlertFloodDao;
 import yuan.flood.dao.IDao.IPredictWaterLevelResultDao;
-import yuan.flood.phase.function.BpDeep;
-import yuan.flood.phase.function.Normalization;
-import yuan.flood.phase.function.SendMail;
 import yuan.flood.service.IService.IEventService;
+import yuan.flood.phase.IPhaseService;
 import yuan.flood.service.IService.ISensorObsPropertyService;
 import yuan.flood.service.IService.ISensorService;
+import yuan.flood.service.function.BpDeep;
+import yuan.flood.service.function.Normalization;
+import yuan.flood.service.function.SendMail;
 import yuan.flood.sos.DataTimeSeries;
 import yuan.flood.sos.Decode;
 import yuan.flood.sos.Encode;
@@ -48,9 +48,9 @@ public class PreparePhaseService implements IPhaseService {
     private IAlertFloodDao alertFloodDao;
 
     @Override
-    public void executeService(String sesID,Date date,Object object) {
+    public void executeService(String sesID,Date date,Object Object) {
         //得到参数
-        SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsByEventSesID(sesID);
+        SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsBySesid(sesID);
 
         //加载当前需要预测的属性，也就是，当前的response属性
         String targetSensorID = subscibeEventParams.getResponseSensor();
@@ -66,9 +66,10 @@ public class PreparePhaseService implements IPhaseService {
         List<SensorObsProperty> usefulProperties = new ArrayList<>();
         Map<SensorObsProperty, List<DataTimeSeries>> propertyDataMap = new HashMap<>();
         //当前时间
-        Date now = new Date();
-        //当前时间前1天时间
-        Date before = new Date(now.getTime() - 1000 * 60 * 60 * 24);
+//        Date now = new Date();
+        Date now = date;
+        //当前时间前七分钟时间
+        Date before = new Date(now.getTime() - 1000 * 15 * 60);
         for (int i=0;i<listFromString.size();i++) {
             //获取传感器属性的数据
             SensorObsProperty sensorObsProperty = sensorObsPropertyService.getSensorPropertyByID(Long.valueOf(listFromString.get(i)));
@@ -77,7 +78,7 @@ public class PreparePhaseService implements IPhaseService {
             try {
                 List<DataTimeSeries> dataTimeSeries= decode.decodeObservation(responseXML);
                 //数据长度小于100，消除该数据
-                if (dataTimeSeries.size() < 100) continue;
+                if (dataTimeSeries.size() < 5) continue;
                 Collections.sort(dataTimeSeries);
 
                 usefulProperties.add(sensorObsProperty);
@@ -93,12 +94,12 @@ public class PreparePhaseService implements IPhaseService {
         String targetObservationXML = encode.getGetObservationByTimeXML(targetSensorID, targetPropertyID, before, now);
         String targetResponseXML = methods.sendPost(SOSSESConfig.getSosurl(), targetObservationXML);
         try {
-         targetDataTimeSeries = decode.decodeObservation(targetResponseXML);
-         if (targetDataTimeSeries.size()<100) try {
-             throw new Exception("水位数据数量无法达到训练要求");
-         } catch (Exception e) {
-             e.printStackTrace();
-         }
+            targetDataTimeSeries = decode.decodeObservation(targetResponseXML);
+            if (targetDataTimeSeries.size()<5) try {
+                throw new Exception("水位数据数量无法达到训练要求");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             Collections.sort(targetDataTimeSeries);
 
         } catch (XmlException e) {
@@ -120,7 +121,7 @@ public class PreparePhaseService implements IPhaseService {
         double[][] tn = Normalization.getNormalizationMatrix(t, outMaxT, outMinT);
 
 
-        BpDeep neuro = new BpDeep(new int[]{p.length,7,10,t.length}, 0.01, 0.8);
+        BpDeep neuro = new BpDeep(new int[]{p.length,10,10,t.length}, 0.01, 0.8);
         for(int times=0;times<50000;times++){
             for (int l=0;l<p[0].length;l++) {
                 double[] input=new double[p.length];
@@ -229,34 +230,35 @@ public class PreparePhaseService implements IPhaseService {
         int rowCount = 0;
         for (Map.Entry entry : preDataIndex.entrySet()) {
             List<DataTimeSeries> dataTimeSeries = data.get(entry.getKey());
-            int endIndex = (int) entry.getKey();
-            List<DataTimeSeries> dataTimeSeries1 = dataTimeSeries.subList(dataTimeSeries.size() - endIndex - colLen, dataTimeSeries.size() - 1 - endIndex);
+            int endIndex = (int) entry.getValue();
+            List<DataTimeSeries> dataTimeSeries1 = dataTimeSeries.subList(dataTimeSeries.size() - endIndex - colLen, dataTimeSeries.size() - endIndex);
             for (int col=0;col<dataTimeSeries1.size()-2;col++) {
                 trainDataMatrix[rowCount][col] = dataTimeSeries1.get(col).getDataValue();
             }
             for (int col=0;col<dataTimeSeries1.size();col++) {
                 predictDataMatix[rowCount][col] = dataTimeSeries1.get(col).getDataValue();
             }
+            rowCount++;
         }
         //根据target数据，形成时间序列（计算两个预测值的时间序列）
-        double[] timeMatrix = new double[colLen];
+        Long[] timeMatrix = new Long[colLen];
         double[][] targetDataMatrix = new double[1][colLen - 2];
         //计算时间平均间隔，根据平均间隔，计算后两个预测结果的时间
-        double avgTimeSpace = 0;
-        double sumTimeSpace = 0;
+        Long avgTimeSpace = 0l;
+        Long sumTimeSpace = 0l;
         for (int i=1;i<targetData.size();i++) {
             sumTimeSpace = sumTimeSpace + targetData.get(i).getTimeLon() - targetData.get(i - 1).getTimeLon();
         }
         avgTimeSpace = sumTimeSpace / (targetData.size() - 1);
-        timeMatrix[colLen - 1] = targetData.get(targetData.size() - 1).getTimeLon()+avgTimeSpace;
-        timeMatrix[colLen - 2] = targetData.get(targetData.size() - 1).getTimeLon() + avgTimeSpace * 2;
+        timeMatrix[colLen - 2] = targetData.get(targetData.size() - 1).getTimeLon()+avgTimeSpace;
+        timeMatrix[colLen - 1] = targetData.get(targetData.size() - 1).getTimeLon() + avgTimeSpace * 2;
         for (int i=targetData.size()-1;i>=2;i--) {
             timeMatrix[i-2] = targetData.get(i).getTimeLon();
-            targetDataMatrix[0][i] = targetData.get(i).getDataValue();
+            targetDataMatrix[0][i-2] = targetData.get(i).getDataValue();
         }
 
         //输出
-        predictWaterLevelResult.setTrainDataMatrix(targetDataMatrix);
+        predictWaterLevelResult.setTrainDataMatrix(trainDataMatrix);
         predictWaterLevelResult.setTrainTargetMatrix(targetDataMatrix);
         predictWaterLevelResult.setTimeLonMatrix(timeMatrix);
         predictWaterLevelResult.setPredictDataMatrix(predictDataMatix);

@@ -56,7 +56,7 @@ public class FeatureUtil {
         String[] eles = listStr.split(SSSP);
         List<String> strings = new ArrayList<>();
         for (int i=0;i<eles.length;i++) {
-            if (Strings.isNullOrEmpty(eles[i].trim())) {
+            if (!Strings.isNullOrEmpty(eles[i].trim())) {
                 strings.add(eles[i].trim());
             }
         }

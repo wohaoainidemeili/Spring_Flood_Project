@@ -117,7 +117,7 @@ public class SubscirbeEventService implements ISubScribeEventService {
         cursor.toEndToken();
         cursor.beginElement(new QName(emlurl, "Guard"));
         cursor.beginElement(new QName(fes, "Filter", "fes"));
-        cursor.beginElement(new QName(fes, "PropertyIsGreaterThan", "fes"));
+        cursor.beginElement(new QName(fes, "PropertyIsGreaterThanOrEqualTo", "fes"));
         cursor.insertElementWithText(new QName(fes, "ValueReference", "fes"), "diagnosis_event/doubleValue");
         cursor.insertElementWithText(new QName(fes, "Literal", "fes"), subscibeEventParams.getDiagnosisRepeatTimes().toString());
         cursor.toSelection(0);
@@ -188,7 +188,7 @@ public class SubscirbeEventService implements ISubScribeEventService {
         cursor.beginElement(new QName(fes, "Filter", "fes"));
         cursor.beginElement(new QName(fes, "And", "fes"));
         cursor.addToSelection();
-        cursor.beginElement(new QName(fes, "PropertyIsGreaterThan", "fes"));
+        cursor.beginElement(new QName(fes, "PropertyIsGreaterThanOrEqualTo", "fes"));
         cursor.insertElementWithText(new QName(fes, "ValueReference", "fes"), "input/doubleValue");
         cursor.beginElement(new QName(fes, "Literal", "fes"));
         cursor.beginElement(new QName(swe, "Quantity", "swe"));
@@ -232,7 +232,7 @@ public class SubscirbeEventService implements ISubScribeEventService {
         cursor.toEndToken();
         cursor.beginElement(new QName(emlurl, "Guard"));
         cursor.beginElement(new QName(fes, "Filter", "fes"));
-        cursor.beginElement(new QName(fes, "PropertyIsGreaterThan", "fes"));
+        cursor.beginElement(new QName(fes, "PropertyIsGreaterThanOrEqualTo", "fes"));
         cursor.insertElementWithText(new QName(fes, "ValueReference", "fes"), "prepare_event/doubleValue");
         cursor.insertElementWithText(new QName(fes, "Literal", "fes"), subscibeEventParams.getPrepareRepeatTimes().toString());
         cursor.toSelection(0);
@@ -262,7 +262,7 @@ public class SubscirbeEventService implements ISubScribeEventService {
         cursor.toEndToken();
         cursor.beginElement(new QName(emlurl, "Guard"));
         cursor.beginElement(new QName(fes, "Filter", "fes"));
-        cursor.beginElement(new QName(fes, "PropertyIsGreaterThan", "fes"));
+        cursor.beginElement(new QName(fes, "PropertyIsGreaterThanOrEqualTo", "fes"));
         cursor.insertElementWithText(new QName(fes, "ValueReference", "fes"), "input/doubleValue");
         cursor.beginElement(new QName(fes, "Literal", "fes"));
         cursor.beginElement(new QName(swe, "Quantity", "swe"));
@@ -299,7 +299,7 @@ public class SubscirbeEventService implements ISubScribeEventService {
         cursor.toEndToken();
         cursor.beginElement(new QName(emlurl, "Guard"));
         cursor.beginElement(new QName(fes, "Filter", "fes"));
-        cursor.beginElement(new QName(fes, "PropertyIsGreaterThan", "fes"));
+        cursor.beginElement(new QName(fes, "PropertyIsGreaterThanOrEqualTo", "fes"));
         cursor.insertElementWithText(new QName(fes, "ValueReference", "fes"), "response_event/doubleValue");
         cursor.insertElementWithText(new QName(fes, "Literal", "fes"), subscibeEventParams.getResponseRepeatTimes().toString());
         cursor.toSelection(0);
@@ -366,7 +366,7 @@ public class SubscirbeEventService implements ISubScribeEventService {
         cursor.toEndToken();
         cursor.beginElement(new QName(emlurl, "Guard"));
         cursor.beginElement(new QName(fes, "Filter", "fes"));
-        cursor.beginElement(new QName(fes, "PropertyIsGreaterThan", "fes"));
+        cursor.beginElement(new QName(fes, "PropertyIsGreaterThanOrEqualTo", "fes"));
         cursor.insertElementWithText(new QName(fes, "ValueReference", "fes"), "recovery_event/doubleValue");
         cursor.insertElementWithText(new QName(fes, "Literal", "fes"), subscibeEventParams.getRecoveryRepeatTimes().toString());
         cursor.toSelection(0);

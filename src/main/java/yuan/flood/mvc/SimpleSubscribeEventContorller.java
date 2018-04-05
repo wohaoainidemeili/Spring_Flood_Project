@@ -212,7 +212,12 @@ public class SimpleSubscribeEventContorller {
             floodResult.setMessage("当前事件参数为空！");
             return floodResult;
         }
+
         SubscibeEventParams subscibeEventParams = ConvertUtil.getSubscibeEventParamsfromSubscribeEventParamsDTO(params);
+        //构建事件的ID
+        Long ID= eventService.getMaxEventOrder();
+        subscibeEventParams.setOrder(ID);
+        subscibeEventParams.setEventID("Event"+ID);
         String sesID = sesConnector.subscribeEvent(subscirbeEventService.createSubscirbeEvent(subscibeEventParams));
         if (Strings.isNullOrEmpty(sesID)) {
             floodResult.setFlag(false);
@@ -225,9 +230,6 @@ public class SimpleSubscribeEventContorller {
 
         //注册完成后入库，清理缓存
         subscibeEventParams.setEventSesID(sesID);
-        Long ID= eventService.getMaxEventOrder();
-        subscibeEventParams.setOrder(ID);
-        subscibeEventParams.setEventID("Event"+ID);
 //        params.setEventName("Event"+ID);
         eventService.saveSubscribeEvent(subscibeEventParams);
 

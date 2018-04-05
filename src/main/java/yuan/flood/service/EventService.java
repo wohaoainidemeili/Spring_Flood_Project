@@ -203,6 +203,8 @@ public class EventService implements IEventService{
             }
             lastEventType=currentEventType;
         }
+        //若最后一个事件与之前的事件类型一致，则将该事件类型记录
+
         return eventPart;
     }
 
@@ -362,6 +364,7 @@ public class EventService implements IEventService{
         String responseXML= methods.sendPost(url, observationRequestXML);
         StringBuilder stringBuilder=new StringBuilder();
         stringBuilder.append("[");
+        stringBuilder.append("{");
         try {
             //get data form observation
             dataTimeSeries= decode.decodeObservation(responseXML);
@@ -372,7 +375,7 @@ public class EventService implements IEventService{
             }
 
             //get event form event database
-            String findStr="from DetectedEvent d where d.event.eventID='"+sesid+"' order by d.startTimeLong";
+            String findStr="from DetectedEvent d where d.event.eventSesID='"+sesid+"' order by d.startTimeLong";
             List events= detectedEventDao.find(findStr);
 
             //get different type of information
@@ -404,6 +407,7 @@ public class EventService implements IEventService{
             stringBuilder.append("],");
             //add zones color diagnosis:green'#90ed7d',prepare:yellow '#f7a35c',response:red'#f15c80',recovery:blue #91e8e1,noEvent,white'#ffffff'
             stringBuilder.append("zones: [");
+            if (differEvents!=null&&differEvents.size()!=0)
             for (int i=0;i<differEvents.size();i++){
                 StringBuilder zonebuilderStr=new StringBuilder();
                 Long zoneValue= differEvents.get(i).getStartTimeLong()-1*60*1000;

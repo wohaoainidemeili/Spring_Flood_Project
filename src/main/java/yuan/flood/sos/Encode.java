@@ -127,12 +127,14 @@ public class Encode {
         cursor.toFirstContentToken();
         cursor.insertElementWithText(new QName(sosUrl, "offering"), "LIESMARS");
         cursor.toEndToken();
+        cursor.addToSelection();
         cursor.beginElement(new QName(sosUrl,"eventTime"));
         cursor.beginElement(new QName(ogc, "TM_Equals"));
         cursor.insertElementWithText(new QName(ogc, "PropertyName"), "om:samplingTime");
         cursor.beginElement(new QName(gml, "TimePeriod"));
         cursor.insertElementWithText(new QName(gml, "beginPosition"), startTimeStr);
         cursor.insertElementWithText(new QName(gml, "endPosition"), endTimeStr);
+        cursor.toSelection(0);
         cursor.toEndToken();
         cursor.insertElementWithText(new QName(sosUrl, "procedure"), sensorID);
         cursor.toEndToken();

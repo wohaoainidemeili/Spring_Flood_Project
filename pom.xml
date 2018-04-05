@@ -52,6 +52,11 @@
             <name>Open Source Geospatial Foundation Repository</name>
             <url>http://download.osgeo.org/webdav/geotools/</url>
         </repository>
+        <!-- 神经网络包-->
+        <repository>
+            <id>neuroph.sourceforge.net</id>
+            <url>http://neuroph.sourceforge.net/maven2/</url>
+        </repository>
     </repositories>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/javax.mail/mail -->
@@ -287,7 +292,11 @@
             <artifactId>guava</artifactId>
             <version>23.0</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.neuroph</groupId>
+            <artifactId>neuroph-core</artifactId>
+            <version>2.94</version>
+        </dependency>
     </dependencies>
 
     <build>
