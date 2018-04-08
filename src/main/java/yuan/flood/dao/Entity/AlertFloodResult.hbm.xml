@@ -1,0 +1,13 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="yuan.flood.dao.Entity">
+    <class name="AlertFloodResult" table="falert_record">
+        <id name="id" type="java.lang.Long" column="predict_id">
+            <generator class="native"/>
+        </id>
+        <property name="time" type="java.util.Date" column="alert_time"/>
+        <property name="message" type="text"  column="message"/>
+        <many-to-one name="subscibeEventParams" lazy="false" class="SubscibeEventParams" cascade="save-update" column="ses_id"></many-to-one>
+    </class>
+</hibernate-mapping>

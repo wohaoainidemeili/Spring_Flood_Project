@@ -12,6 +12,7 @@ public class StatisticFloodResult implements Serializable {
     private Double maxWaterLevel;
     private Long prepareDuration;
     private Long responseDuration;
+    private Long recoveryDuration;
     private SubscibeEventParams subscibeEventParams;
 
     public Long getId() {
@@ -52,6 +53,14 @@ public class StatisticFloodResult implements Serializable {
 
     public void setResponseDuration(Long responseDuration) {
         this.responseDuration = responseDuration;
+    }
+
+    public Long getRecoveryDuration() {
+        return recoveryDuration;
+    }
+
+    public void setRecoveryDuration(Long recoveryDuration) {
+        this.recoveryDuration = recoveryDuration;
     }
 
     public SubscibeEventParams getSubscibeEventParams() {

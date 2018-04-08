@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class RecoveryPhaseService implements IPhaseService{
+public class RecoveryPhaseService implements IPhaseService {
     @Autowired
     IEventService eventService;
     @Autowired
@@ -31,8 +31,9 @@ public class RecoveryPhaseService implements IPhaseService{
     private Decode decode;
     @Autowired
     private IStatisticFloodDao statisticFloodDao;
+
     @Override
-    public void executeService(String sesID, Date date,Object object) {
+    public void executeService(String sesID, Date date, Object object) {
         //获取sesID
         SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsByEventSesID(sesID);
         // /计算最大水位值，计算水位时间等
@@ -43,14 +44,14 @@ public class RecoveryPhaseService implements IPhaseService{
         String observationID = subscibeEventParams.getResponseObservation();
         String sensorID = subscibeEventParams.getResponseSensor();
         String observationRequestXML = encode.getGetObservationByTimeXML(sensorID, observationID, fullEvent.getStartTime(), fullEvent.getEndTime());
-        String responseXML= methods.sendPost(SOSSESConfig.getSosurl(), observationRequestXML);
+        String responseXML = methods.sendPost(SOSSESConfig.getSosurl(), observationRequestXML);
         try {
-            List<DataTimeSeries> dataTimeSeries= decode.decodeObservation(responseXML);
-           //寻找最大水位值
+            List<DataTimeSeries> dataTimeSeries = decode.decodeObservation(responseXML);
+            //寻找最大水位值
             Double maxWaterLevel = -Double.MAX_VALUE;
-            for (int i=0;i<dataTimeSeries.size();i++) {
+            for (int i = 0; i < dataTimeSeries.size(); i++) {
                 Double currentWaterLevel = dataTimeSeries.get(i).getDataValue();
-                if (maxWaterLevel <currentWaterLevel ) {
+                if (maxWaterLevel < currentWaterLevel) {
                     maxWaterLevel = currentWaterLevel;
                 }
             }

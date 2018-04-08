@@ -1,0 +1,16 @@
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="yuan.flood.dao.Entity">
+    <class name="StatisticFloodResult" table="fstatistic_record">
+        <id name="id" type="java.lang.Long" column="id">
+            <generator class="native"/>
+        </id>
+        <property name="statisticTime" type="java.util.Date" column="statistic_time"/>
+        <property name="maxWaterLevel" type="java.lang.Double"  column="max_waterlevel"/>
+        <property name="prepareDuration" type="java.lang.Long" column="prepare_duration"/>
+        <property name="responseDuration" type="java.lang.Long" column="response_duration"/>
+        <property name="recoveryDuration" type="java.lang.Long" column="recovery_duration"/>
+        <many-to-one name="subscibeEventParams" lazy="false" class="SubscibeEventParams" cascade="save-update" column="ses_id"></many-to-one>
+    </class>
+</hibernate-mapping>

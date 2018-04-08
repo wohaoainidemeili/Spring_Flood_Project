@@ -18,6 +18,7 @@ public class SOSSESConfig {
     String prepareServiceClass = "prepareService";
     String responseServiceClass = "responseService";
     String recoveryServiceClass = "recoveryService";
+    String exexcutorServiceTimePeriod = "serviceTimePeriod";
 
 
     static String sosurl;
@@ -32,6 +33,7 @@ public class SOSSESConfig {
     static String prepareserviceclass;
     static String responseserviceclass;
     static String recoveryserviceclass;
+    static long exexcutorservicetimeperiod;
 
     public SOSSESConfig(Properties properties){
         setSosurl(properties.getProperty(sosUrl));
@@ -48,6 +50,7 @@ public class SOSSESConfig {
         setResponseserviceclass(properties.getProperty(responseServiceClass));
         setRecoveryserviceclass(properties.getProperty(recoveryServiceClass));
 
+        setExexcutorservicetimeperiod(Long.valueOf(properties.getProperty(exexcutorServiceTimePeriod)));
     }
 
     public static String getSosurl() {
@@ -144,5 +147,13 @@ public class SOSSESConfig {
 
     public static void setRecoveryserviceclass(String recoveryserviceclass) {
         SOSSESConfig.recoveryserviceclass = recoveryserviceclass;
+    }
+
+    public static long getExexcutorservicetimeperiod() {
+        return exexcutorservicetimeperiod;
+    }
+
+    public static void setExexcutorservicetimeperiod(long exexcutorservicetimeperiod) {
+        SOSSESConfig.exexcutorservicetimeperiod = exexcutorservicetimeperiod;
     }
 }

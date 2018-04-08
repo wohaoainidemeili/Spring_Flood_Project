@@ -65,4 +65,6 @@ public interface IEventService {
 
     public String getLatestEventType(String sesID);
 
+    public List<SubscibeEventParams> getRegisteredEventByUserID(Long userLonID);
+
 }

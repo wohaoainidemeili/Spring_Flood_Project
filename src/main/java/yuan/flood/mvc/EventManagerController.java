@@ -33,37 +33,39 @@ import java.util.stream.Collectors;
 public class EventManagerController {
     @Autowired
     private IEventService eventService;
+
     /**
      * get eventManager pages
+     *
      * @param request
      * @param modelMap
      * @return
      */
-    @RequestMapping(value = "/homePage",method = RequestMethod.GET)
-    public String getHomePage(HttpServletRequest request,ModelMap modelMap){
-        HttpSession session=request.getSession();
-        User user= (User) session.getAttribute("user");
-        if (user!=null){
-            String userID= user.getUserID();
-            modelMap.addAttribute("userName",userID);
+    @RequestMapping(value = "/homePage", method = RequestMethod.GET)
+    public String getHomePage(HttpServletRequest request, ModelMap modelMap) {
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user != null) {
+            String userID = user.getUserID();
+            modelMap.addAttribute("userName", userID);
             //get the info of all event ID
-            List<String> eventIDs= eventService.getAllEventIDs();
-            modelMap.addAttribute("eventIDs",eventIDs);
-        }else {
+            List<String> eventIDs = eventService.getAllEventIDs();
+            modelMap.addAttribute("eventIDs", eventIDs);
+        } else {
             return "login";
         }
         return "eventManager";
     }
 
-    @RequestMapping(value = "/getEventInfo",method = RequestMethod.POST)
+    @RequestMapping(value = "/getEventInfo", method = RequestMethod.POST)
     @ResponseBody
-    public Map<String,Object> getSensorsInfo(){
-        Map<String,Object> myMap=new HashMap<String, Object>();
-        myMap.put("name","sda");
+    public Map<String, Object> getSensorsInfo() {
+        Map<String, Object> myMap = new HashMap<String, Object>();
+        myMap.put("name", "sda");
 
-        List<User> users=new ArrayList<User>();
-        User user1=new User();
-        User user2=new User();
+        List<User> users = new ArrayList<User>();
+        User user1 = new User();
+        User user2 = new User();
         user1.setUserLonID(Long.valueOf(1));
         user1.setUserID("sda");
         user1.setPassWord("sadas");
@@ -72,18 +74,20 @@ public class EventManagerController {
         user2.setUserID("sda");
         user2.setPassWord("sadas");
         users.add(user2);
-        myMap.put("users",users);
-        return myMap ;
+        myMap.put("users", users);
+        return myMap;
     }
 
     /**
      * 拉取所有的事件，不单单包括一个用户的
+     *
      * @param request
      * @return
      */
+    @CrossOrigin(value = "*")
     @RequestMapping(value = "/getAllEventParams", method = RequestMethod.POST)
     @ResponseBody
-    public FloodResult<List<SubscribeEventParamsDTO>> getAllEventParamsByUser(HttpServletRequest request) {
+    public FloodResult<List<SubscribeEventParamsDTO>> getAllEventParams(HttpServletRequest request) {
         FloodResult<List<SubscribeEventParamsDTO>> floodResult = new FloodResult<>();
         floodResult.setFlag(true);
         List<SubscribeEventParamsDTO> subscribeEventParamsDTOS = new ArrayList<>();
@@ -107,4 +111,39 @@ public class EventManagerController {
         return floodResult;
     }
 
+    @CrossOrigin(value = "*")
+    @RequestMapping(value = "/getEventParamsByUserID", method = RequestMethod.POST)
+    @ResponseBody
+    public FloodResult<List<SubscribeEventParamsDTO>> getEventParamsByUserID(HttpServletRequest request){
+        FloodResult<List<SubscribeEventParamsDTO>> floodResult = new FloodResult<>();
+        floodResult.setFlag(true);
+        List<SubscribeEventParamsDTO> subscribeEventParamsDTOS = new ArrayList<>();
+        //获取用户session
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute(SessionNames.USER);
+        if (user == null) {
+            floodResult.setFlag(false);
+            floodResult.setMessage("请先登录，才能查看洪涝事件订阅内容！");
+            return floodResult;
+        }
+
+        try {
+            List<SubscibeEventParams> eventParams = eventService.getRegisteredEventByUserID(user.getUserLonID());
+
+            if (eventParams == null || eventParams.isEmpty()) {
+                floodResult.setFlag(true);
+                floodResult.setMessage("无注册事件");
+                floodResult.setObject(subscribeEventParamsDTOS);
+                return floodResult;
+            }
+            for (int i = 0; i < eventParams.size(); i++) {
+                subscribeEventParamsDTOS.add(ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(eventParams.get(0)));
+            }
+        } catch (Exception e) {
+            floodResult.setFlag(false);
+            floodResult.setMessage("获取事件信息错误！");
+        }
+        floodResult.setObject(subscribeEventParamsDTOS);
+        return floodResult;
+    }
 }

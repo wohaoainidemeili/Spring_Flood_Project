@@ -212,12 +212,23 @@ public class SimpleSubscribeEventContorller {
             floodResult.setMessage("当前事件参数为空！");
             return floodResult;
         }
+        HttpSession session = request.getSession();
+        //获取用户session
+        User user = (User) session.getAttribute(SessionNames.USER);
+        if (user==null) {
+            floodResult.setFlag(false);
+            floodResult.setMessage("请先登录，才能注册传感器事件！");
+            return floodResult;
+        }
 
         SubscibeEventParams subscibeEventParams = ConvertUtil.getSubscibeEventParamsfromSubscribeEventParamsDTO(params);
         //构建事件的ID
         Long ID= eventService.getMaxEventOrder();
         subscibeEventParams.setOrder(ID);
         subscibeEventParams.setEventID("Event"+ID);
+
+        subscibeEventParams.setUser(user);
+
         String sesID = sesConnector.subscribeEvent(subscirbeEventService.createSubscirbeEvent(subscibeEventParams));
         if (Strings.isNullOrEmpty(sesID)) {
             floodResult.setFlag(false);
@@ -233,7 +244,6 @@ public class SimpleSubscribeEventContorller {
 //        params.setEventName("Event"+ID);
         eventService.saveSubscribeEvent(subscibeEventParams);
 
-        HttpSession session = request.getSession();
         session.removeAttribute(SessionNames.SELECT_SENSORS);
         session.removeAttribute(SessionNames.SETTED_EVENT_PARAMS);
         session.removeAttribute(SessionNames.SELECT_PROPERTYIES);

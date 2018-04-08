@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
-public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
+public class PreparePhaseServiceT implements IPreparePhaseServiceT {
     @Autowired
     IEventService eventService;
     @Autowired
@@ -50,8 +50,9 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
     private IPredictWaterLevelResultDao predictWaterLevelResultDao;
     @Autowired
     private IAlertFloodDao alertFloodDao;
+
     @Override
-    public void executeService(String sesID, Date date)  {
+    public void executeService(String sesID, Date date) {
         //得到参数
         SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsBySesid(sesID);
 
@@ -70,21 +71,21 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         Map<SensorObsProperty, List<DataTimeSeries>> propertyDataMap = new LinkedHashMap<>();
         //当前时间
 //        Date now = new Date();
-        Date now = date;
+        Date now = new Date();
         //当前时间前七分钟时间
         Date before = new Date(now.getTime() - 1000 * 15 * 60);
         List<String> sensorNameList = new ArrayList<>();
         List<String> propertyNameList = new ArrayList<>();
-        for (int i=0;i<listFromString.size();i++) {
+        for (int i = 0; i < listFromString.size(); i++) {
             //获取传感器属性的数据
             SensorObsProperty sensorObsProperty = sensorObsPropertyService.getSensorPropertyByID(Long.valueOf(listFromString.get(i)));
 //                System.out.println("yuan:"+sensorObsProperty.getSensorName() + ":" + sensorObsProperty.getPropertyName());
             sensorNameList.add(sensorObsProperty.getSensorName());
             propertyNameList.add(sensorObsProperty.getPropertyName());
             String observationRequestXML = encode.getGetObservationByTimeXML(sensorObsProperty.getSensorID(), sensorObsProperty.getObservedPropertyID(), before, now);
-            String responseXML= methods.sendPost(SOSSESConfig.getSosurl(), observationRequestXML);
+            String responseXML = methods.sendPost(SOSSESConfig.getSosurl(), observationRequestXML);
             try {
-                List<DataTimeSeries> dataTimeSeries= decode.decodeObservation(responseXML);
+                List<DataTimeSeries> dataTimeSeries = decode.decodeObservation(responseXML);
                 //数据长度小于100，消除该数据
                 if (dataTimeSeries.size() < 5) continue;
                 Collections.sort(dataTimeSeries);
@@ -96,7 +97,7 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
                 e.printStackTrace();
             }
         }
-        for (int i=0;i<sensorNameList.size();i++) {
+        for (int i = 0; i < sensorNameList.size(); i++) {
             System.out.println(sensorNameList.get(i) + ":" + propertyNameList.get(i));
         }
         //对齐传感器数据
@@ -106,7 +107,7 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         String targetResponseXML = methods.sendPost(SOSSESConfig.getSosurl(), targetObservationXML);
         try {
             targetDataTimeSeries = decode.decodeObservation(targetResponseXML);
-            if (targetDataTimeSeries.size()<5) try {
+            if (targetDataTimeSeries.size() < 5) try {
                 throw new Exception("水位数据数量无法达到训练要求");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -134,19 +135,19 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
 
 
         //运用neuroph工具计算BP神经网络训练
-        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID,trainRows,7,10,targetRows);
+        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, 7, 10, targetRows);
         BackPropagation backPropagation = new BackPropagation();
         backPropagation.setLearningRate(0.001);
         backPropagation.setMaxIterations(50000);
         backPropagation.setMaxError(0.000000000001);
         DataSet trainDataSet = new DataSet(trainRows, 1);
-        for (int l=0;l<pn[0].length;l++) {
-            double[] input=new double[trainRows];
+        for (int l = 0; l < pn[0].length; l++) {
+            double[] input = new double[trainRows];
             double[] expectedOutput = new double[targetRows];
-            for (int h=0;h<pn.length;h++) {
+            for (int h = 0; h < pn.length; h++) {
                 input[h] = pn[h][l];
             }
-            for (int h=0;h<tn.length;h++) {
+            for (int h = 0; h < tn.length; h++) {
                 expectedOutput[h] = tn[h][l];
             }
             trainDataSet.addRow(new DataSetRow(input, expectedOutput));
@@ -160,15 +161,15 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         //测试数据按照原有原则归一化
         double[][] p2n = getTramNormalizationMatrix(predictDataMatrix, outMaxP, outMinP);
         double[][] result = new double[tn.length][p2n[0].length];
-        for (int i=0;i<tn.length;i++) {
+        for (int i = 0; i < tn.length; i++) {
             for (int j = 0; j < p2n[0].length; j++) {
                 result[i][j] = 0;
             }
         }
         List<Double> resultRowArray = new ArrayList<>();
-        for(int l=0;l<p2n[0].length;l++) {
+        for (int l = 0; l < p2n[0].length; l++) {
             double[] inputTest = new double[p2n.length];
-            for (int h=0;h<p2n.length;h++) {
+            for (int h = 0; h < p2n.length; h++) {
                 inputTest[h] = p2n[h][l];
             }
             neuralNetwork.setInput(inputTest);
@@ -181,19 +182,37 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         resultMatrix.add(resultRowArray);
         //将归一化数据解算返回
         double[][] resultT = getReverseNormalizationMatrix(resultMatrix, outMaxT, outMinT);
+        //设置预测的时间点
+        predictArrayResult.setPredictTime(now);
 
+        List<List<Double>> predictResultMatrix = new ArrayList<>();
+        for (int i = 0; i < resultT.length; i++) {
+            List<Double> predictResultArray = new ArrayList<>();
+            for (int j = 0; j < resultT[i].length; j++) {
+                predictResultArray.add(resultT[i][j]);
+            }
+            predictResultMatrix.add(predictResultArray);
+        }
 
-          PredictWaterLevelResult predictWaterLevelResult = new PredictWaterLevelResult();
-            predictWaterLevelResult.setPredictResultMatrix(resultT);
+        //将数组转换为String形式
+        List<String> timeLonStrList = new ArrayList<>();
+        Long[] timeLonMatrix = predictArrayResult.getTimeLonMatrix();
+        for (int i = 0; i < timeLonMatrix.length; i++) {
+            timeLonStrList.add(String.valueOf(timeLonMatrix[i]));
+        }
+        String timeLonListStr = FeatureUtil.getStringFromList(timeLonStrList);
+        predictArrayResult.setTimeLonMatrixStr(timeLonListStr);
+        predictArrayResult.setTrainTargetMatrixStr(FeatureUtil.getStringFromListListDouble(targetDataMatrix));
+        predictArrayResult.setPredictResultMatrixStr(FeatureUtil.getStringFromListListDouble(predictResultMatrix));
 
-            //设置预测的订阅ID
-            predictWaterLevelResult.setSubscibeEventParams(subscibeEventParams);
-            //将预测结果存储到数据库中
-            predictWaterLevelResultDao.save(predictWaterLevelResult);
+        //设置预测的订阅ID
+        predictArrayResult.setSubscibeEventParams(subscibeEventParams);
+        //将预测结果存储到数据库中
+        predictWaterLevelResultDao.save(predictArrayResult);
 
         //生成预警消息内容，并将预警消息存储到数据库中
         AlertFloodResult alertFloodResult = new AlertFloodResult();
-        alertFloodResult.setTime(date);
+        alertFloodResult.setTime(now);
         alertFloodResult.setSubscibeEventParams(subscibeEventParams);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -201,18 +220,18 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         try {
             //create message
             StringBuffer message = new StringBuffer();
-            message.append("您订阅的事件" + subscibeEventParams.getEventID() + "于" + dateStr + "进入准备阶段。\r\n");
+            message.append("您订阅的事件\"" + subscibeEventParams.getUserDefineName() + "\"于" + dateStr + "进入准备阶段。\r\n");
             message.append("该事件的" + subscibeEventParams.getPrepareSensor() + "传感器观测值ֵ");
             message.append("在" + subscibeEventParams.getPrepareDay() + "天");
             message.append(subscibeEventParams.getPrepareHour() + "时");
             message.append(subscibeEventParams.getPrepareMinute() + "分");
-            message.append(subscibeEventParams.getDiagnosisSecond() + "秒");
+            message.append(subscibeEventParams.getPrepareSecond() + "秒");
             message.append("内大于" + subscibeEventParams.getPrepareThreshold() + "m");
-            message.append("出现次数超过" + subscibeEventParams.getPrepareRepeatTimes() + "次");
-//                message.append("该水位站点预测水位未来两天结果为" + predictWaterLevelResult.getPredictResultMatrixStr());
+            message.append("出现次数达到或超过" + subscibeEventParams.getPrepareRepeatTimes() + "次。\r\n");
+            message.append("该水位站点预测水位未来两天结果为" + predictArrayResult.getPredictResultMatrixStr());
             alertFloodResult.setMessage(message.toString());
             //email发送消息内容
-            SendMail.send("wenying3413ying@126.com", "dwytam1314", subscibeEventParams.getEmail(), subscibeEventParams.getEventName() + "事件进入准备阶段", message.toString());
+            SendMail.send("wenying3413ying@126.com", "dwytam1314", subscibeEventParams.getEmail(), subscibeEventParams.getUserDefineName() + "事件进入准备阶段", message.toString());
         } catch (MessagingException e) {
             e.printStackTrace();
         }
@@ -222,7 +241,8 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
     }
 
     /**
-     *根据输入目标数据，与辅助预测数据，计算数据对齐后的矩阵，同时需要构建时间序列，
+     * 根据输入目标数据，与辅助预测数据，计算数据对齐后的矩阵，同时需要构建时间序列，
+     *
      * @param targetData
      * @param data
      * @return
@@ -249,27 +269,27 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
             Long deltaSecond = Math.abs(startFirstTarget - startSecondOther);
 
 
-            if (deltaFirst<deltaSecond) {
+            if (deltaFirst < deltaSecond) {
                 preDataIndex.put((SensorObsProperty) entry.getKey(), 0);
-                colLen = getMinValue(targetData.size(), dataTimeSeries.size());}
-
-            else{
+                colLen = getMinValue(targetData.size(), dataTimeSeries.size());
+            } else {
                 preDataIndex.put((SensorObsProperty) entry.getKey(), 1);
-                colLen = getMinValue(targetData.size(), dataTimeSeries.size() - 1);}
+                colLen = getMinValue(targetData.size(), dataTimeSeries.size() - 1);
+            }
 
         }
         //形成数据的矩阵
-        double[][] trainDataMatrix = new double[rowLen][colLen-2];
+        double[][] trainDataMatrix = new double[rowLen][colLen - 2];
         double[][] predictDataMatix = new double[rowLen][colLen];
         int rowCount = 0;
         for (Map.Entry entry : preDataIndex.entrySet()) {
             List<DataTimeSeries> dataTimeSeries = data.get(entry.getKey());
             int endIndex = (int) entry.getValue();
             List<DataTimeSeries> dataTimeSeries1 = dataTimeSeries.subList(dataTimeSeries.size() - endIndex - colLen, dataTimeSeries.size() - endIndex);
-            for (int col=0;col<dataTimeSeries1.size()-2;col++) {
+            for (int col = 0; col < dataTimeSeries1.size() - 2; col++) {
                 trainDataMatrix[rowCount][col] = dataTimeSeries1.get(col).getDataValue();
             }
-            for (int col=0;col<dataTimeSeries1.size();col++) {
+            for (int col = 0; col < dataTimeSeries1.size(); col++) {
                 predictDataMatix[rowCount][col] = dataTimeSeries1.get(col).getDataValue();
             }
             rowCount++;
@@ -280,15 +300,15 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         //计算时间平均间隔，根据平均间隔，计算后两个预测结果的时间
         Long avgTimeSpace = 0l;
         Long sumTimeSpace = 0l;
-        for (int i=1;i<targetData.size();i++) {
+        for (int i = 1; i < targetData.size(); i++) {
             sumTimeSpace = sumTimeSpace + targetData.get(i).getTimeLon() - targetData.get(i - 1).getTimeLon();
         }
         avgTimeSpace = sumTimeSpace / (targetData.size() - 1);
-        timeMatrix[colLen - 2] = targetData.get(targetData.size() - 1).getTimeLon()+avgTimeSpace;
+        timeMatrix[colLen - 2] = targetData.get(targetData.size() - 1).getTimeLon() + avgTimeSpace;
         timeMatrix[colLen - 1] = targetData.get(targetData.size() - 1).getTimeLon() + avgTimeSpace * 2;
-        for (int i=targetData.size()-1;i>=2;i--) {
-            timeMatrix[i-2] = targetData.get(i).getTimeLon();
-            targetDataMatrix[0][i-2] = targetData.get(i).getDataValue();
+        for (int i = targetData.size() - 1; i >= 2; i--) {
+            timeMatrix[i - 2] = targetData.get(i).getTimeLon();
+            targetDataMatrix[0][i - 2] = targetData.get(i).getDataValue();
         }
 
         //输出
@@ -321,13 +341,13 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
             Long deltaSecond = Math.abs(startFirstTarget - startSecondOther);
 
 
-            if (deltaFirst<deltaSecond) {
+            if (deltaFirst < deltaSecond) {
                 preDataIndex.put((SensorObsProperty) entry.getKey(), 0);
-                colLen = getMinValue(targetData.size(), dataTimeSeries.size());}
-
-            else{
+                colLen = getMinValue(targetData.size(), dataTimeSeries.size());
+            } else {
                 preDataIndex.put((SensorObsProperty) entry.getKey(), 1);
-                colLen = getMinValue(targetData.size(), dataTimeSeries.size() - 1);}
+                colLen = getMinValue(targetData.size(), dataTimeSeries.size() - 1);
+            }
 
         }
         //形成数据的矩阵 colen-2
@@ -339,12 +359,12 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
             int endIndex = (int) entry.getValue();
             List<DataTimeSeries> dataTimeSeries1 = dataTimeSeries.subList(dataTimeSeries.size() - endIndex - colLen, dataTimeSeries.size() - endIndex);
             List<Double> trainRowArray = new ArrayList<>();
-            for (int col=0;col<dataTimeSeries1.size()-2;col++) {
+            for (int col = 0; col < dataTimeSeries1.size() - 2; col++) {
                 trainRowArray.add(dataTimeSeries1.get(col).getDataValue());
             }
             trainDataMatrix.add(trainRowArray);
             List<Double> predictRowArray = new ArrayList<>();
-            for (int col=0;col<dataTimeSeries1.size();col++) {
+            for (int col = 0; col < dataTimeSeries1.size(); col++) {
                 predictRowArray.add(dataTimeSeries1.get(col).getDataValue());
             }
             predictDataMatix.add(predictRowArray);
@@ -355,15 +375,15 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         //计算时间平均间隔，根据平均间隔，计算后两个预测结果的时间
         Long avgTimeSpace = 0l;
         Long sumTimeSpace = 0l;
-        for (int i=1;i<targetData.size();i++) {
+        for (int i = 1; i < targetData.size(); i++) {
             sumTimeSpace = sumTimeSpace + targetData.get(i).getTimeLon() - targetData.get(i - 1).getTimeLon();
         }
         avgTimeSpace = sumTimeSpace / (targetData.size() - 1);
-        timeMatrix[colLen - 2] = targetData.get(targetData.size() - 1).getTimeLon()+avgTimeSpace;
+        timeMatrix[colLen - 2] = targetData.get(targetData.size() - 1).getTimeLon() + avgTimeSpace;
         timeMatrix[colLen - 1] = targetData.get(targetData.size() - 1).getTimeLon() + avgTimeSpace * 2;
         List<Double> targetRowArray = new ArrayList<>();
-        for (int i=2;i<targetData.size();i++) {
-            timeMatrix[i-2] = targetData.get(i).getTimeLon();
+        for (int i = 2; i < targetData.size(); i++) {
+            timeMatrix[i - 2] = targetData.get(i).getTimeLon();
             targetRowArray.add(targetData.get(i).getDataValue());
         }
         targetDataMatrix.add(targetRowArray);
@@ -373,6 +393,7 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         predictArrayResult.setTimeLonMatrix(timeMatrix);
         return predictArrayResult;
     }
+
     public int getMinValue(int value1, int value2) {
         if (value1 > value2) {
             return value2;
@@ -382,18 +403,19 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
     /**
      * 归一化数据，并得到最大值最小值，以及归一化后的数据归一化到（0,1）
      * 按行归一化，每行归一化0-1
+     *
      * @param inputMatrix
      * @param outMaxValue
      * @param outMinValue
      * @return
      */
-    public double[][] getNormalizationMatrix(List<List<Double>> inputMatrix,List<Double> outMaxValue,List<Double> outMinValue) {
-        if (inputMatrix==null||inputMatrix.size()==0) return null;
+    public double[][] getNormalizationMatrix(List<List<Double>> inputMatrix, List<Double> outMaxValue, List<Double> outMinValue) {
+        if (inputMatrix == null || inputMatrix.size() == 0) return null;
         //找到最大最小值
-        for (int i=0;i<inputMatrix.size();i++) {
+        for (int i = 0; i < inputMatrix.size(); i++) {
             double minValue = Double.MAX_VALUE;
             double maxValue = -Double.MAX_VALUE;
-            for (int j=0;j<inputMatrix.get(i).size();j++) {
+            for (int j = 0; j < inputMatrix.get(i).size(); j++) {
                 Double currentValue = inputMatrix.get(i).get(j);
                 if (currentValue > maxValue) {
                     maxValue = currentValue;
@@ -408,14 +430,14 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         //归一化
         double[][] result = new double[inputMatrix.size()][inputMatrix.get(0).size()];
 
-        for (int i=0;i<result.length;i++) {
+        for (int i = 0; i < result.length; i++) {
             double maxValue = outMaxValue.get(i);
             double minValue = outMinValue.get(i);
-            if (minValue==maxValue) {
-                for (int j=0;j<result[i].length;j++) {
+            if (minValue == maxValue) {
+                for (int j = 0; j < result[i].length; j++) {
                     result[i][j] = 1;
                 }
-            }else {
+            } else {
                 for (int j = 0; j < result[i].length; j++) {
                     result[i][j] = (inputMatrix.get(i).get(j) - minValue) / (maxValue - minValue);
                 }
@@ -426,25 +448,25 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
 
     /**
      * 反向归一化，从（0,1）解算得到原始数据
+     *
      * @param normalizedMatrix
-     * @param maxValueArray 每一行的最大值
-     * @param minValueArray 每一行的最小值
+     * @param maxValueArray    每一行的最大值
+     * @param minValueArray    每一行的最小值
      * @return
      */
-    public  double[][] getReverseNormalizationMatrix(List<List<Double>> normalizedMatrix, List<Double> maxValueArray, List<Double> minValueArray) {
-        if (normalizedMatrix==null||normalizedMatrix.size()==0) return null;
+    public double[][] getReverseNormalizationMatrix(List<List<Double>> normalizedMatrix, List<Double> maxValueArray, List<Double> minValueArray) {
+        if (normalizedMatrix == null || normalizedMatrix.size() == 0) return null;
 
         double[][] result = new double[normalizedMatrix.size()][normalizedMatrix.get(0).size()];
 
-        for (int i=0;i<normalizedMatrix.size();i++) {
+        for (int i = 0; i < normalizedMatrix.size(); i++) {
             double maxValue = maxValueArray.get(i);
             double minValue = minValueArray.get(i);
-            if (maxValue==minValue){
-                for (int j=0;j<normalizedMatrix.get(i).size();j++)
-                {
+            if (maxValue == minValue) {
+                for (int j = 0; j < normalizedMatrix.get(i).size(); j++) {
                     result[i][j] = minValue;
                 }
-            }else {
+            } else {
                 for (int j = 0; j < normalizedMatrix.get(i).size(); j++) {
                     result[i][j] = normalizedMatrix.get(i).get(j) * (maxValue - minValue) + minValue;
                 }
@@ -456,22 +478,23 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
 
     /**
      * 根据原有的归一化规则，归一化数据，数据范围可能不在（0,1）
+     *
      * @param inputMatrix
      * @param maxValueArray
      * @param minValueArray
      * @return
      */
-    public double[][] getTramNormalizationMatrix(List<List<Double>>inputMatrix, List<Double> maxValueArray, List<Double> minValueArray) {
-        if (inputMatrix==null||inputMatrix.size()==0) return null;
+    public double[][] getTramNormalizationMatrix(List<List<Double>> inputMatrix, List<Double> maxValueArray, List<Double> minValueArray) {
+        if (inputMatrix == null || inputMatrix.size() == 0) return null;
         double[][] result = new double[inputMatrix.size()][inputMatrix.get(0).size()];
-        for (int i=0;i<inputMatrix.size();i++) {
+        for (int i = 0; i < inputMatrix.size(); i++) {
             double maxValue = maxValueArray.get(i);
             double minValue = minValueArray.get(i);
-            if (maxValue==minValue) {
+            if (maxValue == minValue) {
                 for (int j = 0; j < inputMatrix.get(i).size(); j++) {
                     result[i][j] = 1;
                 }
-            }else {
+            } else {
                 for (int j = 0; j < inputMatrix.get(i).size(); j++) {
                     result[i][j] = (inputMatrix.get(i).get(j) - minValue) / (maxValue - minValue);
                 }
@@ -479,6 +502,7 @@ public class PreparePhaseServiceT  implements IPreparePhaseServiceT {
         }
         return result;
     }
+
 
 }
 

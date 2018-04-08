@@ -471,4 +471,13 @@ public class EventService implements IEventService{
         return detectEvents.get(0).getEventTypeName();
     }
 
+    @Override
+    public List<SubscibeEventParams> getRegisteredEventByUserID(Long userLonID) {
+        String findStr = "from SubscibeEventParams s where s.user='" + userLonID + "'";
+        List events= eventDao.find(findStr);
+        if (events==null||events.isEmpty()) return null;
+        return events;
+    }
+
+
 }

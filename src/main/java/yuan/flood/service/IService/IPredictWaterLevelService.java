@@ -1,9 +1,10 @@
 package yuan.flood.service.IService;
 
+import yuan.flood.dao.Entity.PredictArrayResult;
 import yuan.flood.dao.Entity.PredictWaterLevelResult;
 
 public interface IPredictWaterLevelService {
-    void savePredictWaterLevelResult(PredictWaterLevelResult predictWaterLevelResult);
+    void savePredictWaterLevelResult(PredictArrayResult predictWaterLevelResult);
 
     PredictWaterLevelResult getPredictWaterLevelResultByTest(String hql);
     /**

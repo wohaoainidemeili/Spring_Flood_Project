@@ -74,4 +74,46 @@ public class FeatureUtil {
         return stringBuffer.toString();
     }
 
+    /**
+     * 将List<List<Double>>型数组矩阵，转换为string字符串存储
+     * @param listList
+     * @return
+     */
+    public static String getStringFromListListDouble(List<List<Double>> listList) {
+        StringBuffer stringBuffer = new StringBuffer();
+        if (listList==null||listList.size()==0) return stringBuffer.toString();
+        for (int i=0;i<listList.size();i++) {
+            List<Double> currentLis = listList.get(i);
+            for (int j=0;j<currentLis.size()-1;j++) {
+                stringBuffer.append(currentLis.get(j));
+                stringBuffer.append(SSSP);
+            }
+            stringBuffer.append(currentLis.get(currentLis.size() - 1));
+            stringBuffer.append(SP);
+        }
+        return stringBuffer.toString();
+    }
+
+    /**
+     * 将String转换为List<List<Double>>型数组矩阵
+     * @param string
+     * @return
+     */
+    public static List<List<Double>> getListListDoubleFromString(String string) {
+        if (Strings.isNullOrEmpty(string)) return new ArrayList<>();
+        //解析
+        List<List<Double>> listList = new ArrayList<>();
+        String[] listStr = string.split(SP);
+        for (int i=0;i<listStr.length;i++) {
+            List<Double> list = new ArrayList<>();
+            String[] currentEles = listStr[i].split(SSSP);
+            if (currentEles==null||currentEles.length==0) continue;
+            for (int j=0;j<currentEles.length;j++) {
+                list.add(Double.valueOf(currentEles[j]));
+            }
+            listList.add(list);
+        }
+        return listList;
+    }
+
 }

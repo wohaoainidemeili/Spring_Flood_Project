@@ -1,9 +1,12 @@
 package yuan.flood.dao.Entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class PredictArrayResult {
+public class PredictArrayResult implements Serializable {
+    private Long id;
     /**
      * 训练数据
      */
@@ -24,6 +27,20 @@ public class PredictArrayResult {
      * 时间序列，预测结果的时间序列
      */
     private Long[] timeLonMatrix;
+
+    private String trainTargetMatrixStr;
+    private String timeLonMatrixStr;
+    private String predictResultMatrixStr;
+    private Date predictTime;
+    private SubscibeEventParams subscibeEventParams;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public List<List<Double>> getTrainDataMatrix() {
         return trainDataMatrix;
@@ -63,5 +80,45 @@ public class PredictArrayResult {
 
     public void setTimeLonMatrix(Long[] timeLonMatrix) {
         this.timeLonMatrix = timeLonMatrix;
+    }
+
+    public String getTrainTargetMatrixStr() {
+        return trainTargetMatrixStr;
+    }
+
+    public void setTrainTargetMatrixStr(String trainTargetMatrixStr) {
+        this.trainTargetMatrixStr = trainTargetMatrixStr;
+    }
+
+    public String getTimeLonMatrixStr() {
+        return timeLonMatrixStr;
+    }
+
+    public void setTimeLonMatrixStr(String timeLonMatrixStr) {
+        this.timeLonMatrixStr = timeLonMatrixStr;
+    }
+
+    public String getPredictResultMatrixStr() {
+        return predictResultMatrixStr;
+    }
+
+    public void setPredictResultMatrixStr(String predictResultMatrixStr) {
+        this.predictResultMatrixStr = predictResultMatrixStr;
+    }
+
+    public Date getPredictTime() {
+        return predictTime;
+    }
+
+    public void setPredictTime(Date predictTime) {
+        this.predictTime = predictTime;
+    }
+
+    public SubscibeEventParams getSubscibeEventParams() {
+        return subscibeEventParams;
+    }
+
+    public void setSubscibeEventParams(SubscibeEventParams subscibeEventParams) {
+        this.subscibeEventParams = subscibeEventParams;
     }
 }

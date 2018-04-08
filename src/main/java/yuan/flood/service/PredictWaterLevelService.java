@@ -2,6 +2,7 @@ package yuan.flood.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import yuan.flood.dao.Entity.PredictArrayResult;
 import yuan.flood.dao.Entity.PredictWaterLevelResult;
 import yuan.flood.dao.IDao.IPredictWaterLevelResultDao;
 import yuan.flood.service.IService.IPredictWaterLevelService;
@@ -13,7 +14,7 @@ public class PredictWaterLevelService implements IPredictWaterLevelService{
     IPredictWaterLevelResultDao predictWaterLevelResultDao;
 
     @Override
-    public void savePredictWaterLevelResult(PredictWaterLevelResult predictWaterLevelResult) {
+    public void savePredictWaterLevelResult(PredictArrayResult predictWaterLevelResult) {
         predictWaterLevelResultDao.save(predictWaterLevelResult);
     }
 
@@ -25,8 +26,8 @@ public class PredictWaterLevelService implements IPredictWaterLevelService{
 
     @Override
     public PredictWaterLevelResult getLastPredictWaterLevelResultBySESID(String sesID) {
-        String countHql = "select count(*) from PredictWaterLevelResult p";
-        String predictFindHql = "from PredictWaterLevelResult p where p.subscibeEventParams='" + sesID + "'";
+        String countHql = "select count(*) from PredictArrayResult p";
+        String predictFindHql = "from PredictArrayResult p where p.subscibeEventParams='" + sesID + "'";
         predictWaterLevelResultDao.find(predictFindHql);
 
         return null;

@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import yuan.flood.dao.Entity.DetectedFullEvent;
 import yuan.flood.dao.Entity.StatisticFloodResult;
 import yuan.flood.dao.Entity.SubscibeEventParams;
+import yuan.flood.dao.IDao.IDetectedFullEventDao;
 import yuan.flood.dao.IDao.IStatisticFloodDao;
 import yuan.flood.service.IService.IEventService;
 import yuan.flood.service.IService.IPhaseService;
+import yuan.flood.service.IService.IRecoveryPhaseService;
 import yuan.flood.service.IService.ISensorService;
 import yuan.flood.sos.DataTimeSeries;
 import yuan.flood.sos.Decode;
@@ -19,7 +21,7 @@ import yuan.flood.until.SOSSESConfig;
 import java.util.Date;
 import java.util.List;
 @Service
-public class RecoveryPhaseService implements IPhaseService {
+public class RecoveryPhaseService implements IRecoveryPhaseService {
     @Autowired
     IEventService eventService;
     @Autowired
@@ -32,14 +34,16 @@ public class RecoveryPhaseService implements IPhaseService {
     private Decode decode;
     @Autowired
     private IStatisticFloodDao statisticFloodDao;
+    @Autowired
+    private IDetectedFullEventDao detectedFullEventDao;
     @Override
-    public void executeService(String sesID, Date date,Object object) {
+    public void executeService(String sesID, Date date,DetectedFullEvent object) {
         //获取sesID
-        SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsByEventSesID(sesID);
+        SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsBySesid(sesID);
         // /计算最大水位值，计算水位时间等
         StatisticFloodResult statisticFloodResult = new StatisticFloodResult();
 
-        DetectedFullEvent fullEvent = (DetectedFullEvent) object;
+        DetectedFullEvent fullEvent = object;
         //根据传感器ID和属性ID来获取数据
         String observationID = subscibeEventParams.getResponseObservation();
         String sensorID = subscibeEventParams.getResponseSensor();
@@ -63,10 +67,16 @@ public class RecoveryPhaseService implements IPhaseService {
         //计算准备阶段时间
         Long prepareTimeLength = fullEvent.getResponseStartTime().getTime() - fullEvent.getPrepareStartTime().getTime();
         Long responnseTimeLength = fullEvent.getRecoveryStartTime().getTime() - fullEvent.getResponseStartTime().getTime();
+        Long recoveryTimeLength = fullEvent.getRecoveryEndTime().getTime() - fullEvent.getRecoveryStartTime().getTime();
 
         statisticFloodResult.setPrepareDuration(prepareTimeLength);
         statisticFloodResult.setResponseDuration(responnseTimeLength);
+        statisticFloodResult.setRecoveryDuration(recoveryTimeLength);
+
         statisticFloodResult.setSubscibeEventParams(subscibeEventParams);
+        //设置全事件的关联事件信息，并存储
+        object.setEvent(subscibeEventParams);
+        detectedFullEventDao.save(object);
 
         //存放在数据库中
         statisticFloodDao.save(statisticFloodResult);

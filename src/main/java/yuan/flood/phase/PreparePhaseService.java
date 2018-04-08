@@ -155,7 +155,6 @@ public class PreparePhaseService implements IPhaseService {
         //设置预测的订阅ID
         predictWaterLevelResult.setSubscibeEventParams(subscibeEventParams);
         //将预测结果存储到数据库中
-        predictWaterLevelResultDao.save(predictWaterLevelResult);
 
         //生成预警消息内容，并将预警消息存储到数据库中
         AlertFloodResult alertFloodResult = new AlertFloodResult();
