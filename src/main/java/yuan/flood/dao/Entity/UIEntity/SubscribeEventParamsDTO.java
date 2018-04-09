@@ -71,6 +71,10 @@ public class SubscribeEventParamsDTO {
     private String email;
 
     // 服务参数
+    //BP神经网络服务参数
+    private Double learningRate;
+    private Integer maxIterations;
+    private Double maxError;
     private List<String> sensorPropertyIDs = new ArrayList<>();
     private Map<String, String> featureMap = new HashMap<>();
 
@@ -464,4 +468,27 @@ public class SubscribeEventParamsDTO {
         this.featureMap = featureMap;
     }
 
+    public double getLearningRate() {
+        return learningRate;
+    }
+
+    public void setLearningRate(Double learningRate) {
+        this.learningRate = learningRate;
+    }
+
+    public Integer getMaxIterations() {
+        return maxIterations;
+    }
+
+    public void setMaxIterations(Integer maxIterations) {
+        this.maxIterations = maxIterations;
+    }
+
+    public double getMaxError() {
+        return maxError;
+    }
+
+    public void setMaxError(Double maxError) {
+        this.maxError = maxError;
+    }
 }

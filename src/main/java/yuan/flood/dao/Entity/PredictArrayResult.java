@@ -32,6 +32,10 @@ public class PredictArrayResult implements Serializable {
     private String timeLonMatrixStr;
     private String predictResultMatrixStr;
     private Date predictTime;
+    /**
+     * 用于记录触发预测服务的消息内容
+     */
+    private String subject;
     private SubscibeEventParams subscibeEventParams;
 
     public Long getId() {
@@ -120,5 +124,13 @@ public class PredictArrayResult implements Serializable {
 
     public void setSubscibeEventParams(SubscibeEventParams subscibeEventParams) {
         this.subscibeEventParams = subscibeEventParams;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 }

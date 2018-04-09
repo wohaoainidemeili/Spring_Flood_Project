@@ -35,6 +35,9 @@ public class SingleEventSensorDTO {
     private SensorDTO recoverySensor;
     private ObservedPropertyDTO recoveryProperty;
 
+    /**
+     * 存放用于预测的传感器信息
+     */
     List<SensorDTO> sensors = new ArrayList<SensorDTO>();
 
     public SensorDTO getDiagnosisSensor() {

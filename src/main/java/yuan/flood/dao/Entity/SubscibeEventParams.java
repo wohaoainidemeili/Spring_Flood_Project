@@ -69,7 +69,10 @@ public class SubscibeEventParams {
     //key value字段，用于存储服务的参数配置
     private String serviceParams;
     private User user;
-
+    //BP神经网络配置参数
+    private Double learningRate;
+    private Integer maxIterations;
+    private Double maxError;
     private String featureString;
     private Set<DetectedEvent> detectedEvents=new HashSet<DetectedEvent>();
 
@@ -471,5 +474,29 @@ public class SubscibeEventParams {
 
     public void setFeatureString(String featureString) {
         this.featureString = featureString;
+    }
+
+    public double getLearningRate() {
+        return learningRate;
+    }
+
+    public void setLearningRate(Double learningRate) {
+        this.learningRate = learningRate;
+    }
+
+    public Integer getMaxIterations() {
+        return maxIterations;
+    }
+
+    public void setMaxIterations(Integer maxIterations) {
+        this.maxIterations = maxIterations;
+    }
+
+    public double getMaxError() {
+        return maxError;
+    }
+
+    public void setMaxError(Double maxError) {
+        this.maxError = maxError;
     }
 }

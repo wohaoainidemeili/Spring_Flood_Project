@@ -25,11 +25,14 @@ public class PredictWaterLevelService implements IPredictWaterLevelService{
     }
 
     @Override
-    public PredictWaterLevelResult getLastPredictWaterLevelResultBySESID(String sesID) {
+    public List<PredictArrayResult> getLastPredictWaterLevelResultBySESID(String sesID) {
         String countHql = "select count(*) from PredictArrayResult p";
-        String predictFindHql = "from PredictArrayResult p where p.subscibeEventParams='" + sesID + "'";
-        predictWaterLevelResultDao.find(predictFindHql);
-
-        return null;
+        String predictFindHql = "from PredictArrayResult p where p.subscibeEventParams.eventID='" + sesID + "'";
+        List<Long> countList = predictWaterLevelResultDao.find(countHql);
+        if (countList.get(0)==0) return null;
+        List<PredictArrayResult> predictArrayResultList = predictWaterLevelResultDao.find(predictFindHql);
+        if (predictArrayResultList==null||predictArrayResultList.size()==0) return null;
+        return predictArrayResultList;
     }
+
 }

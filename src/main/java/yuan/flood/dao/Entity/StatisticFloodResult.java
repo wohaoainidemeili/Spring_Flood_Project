@@ -8,8 +8,16 @@ import java.util.Date;
  */
 public class StatisticFloodResult implements Serializable {
     private Long id;
+    private Date startTime;
+    private Date endTime;
+    private Date diagnosisStartTime;
+    private Date prepareStartTime;
+    private Date responseStartTime;
+    private Date recoveryStartTime;
+    private Date recoveryEndTime;
     private Date statisticTime;
     private Double maxWaterLevel;
+    private Date maxWaterLevelTime;
     private Long prepareDuration;
     private Long responseDuration;
     private Long recoveryDuration;
@@ -67,7 +75,71 @@ public class StatisticFloodResult implements Serializable {
         return subscibeEventParams;
     }
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Date getDiagnosisStartTime() {
+        return diagnosisStartTime;
+    }
+
+    public void setDiagnosisStartTime(Date diagnosisStartTime) {
+        this.diagnosisStartTime = diagnosisStartTime;
+    }
+
+    public Date getPrepareStartTime() {
+        return prepareStartTime;
+    }
+
+    public void setPrepareStartTime(Date prepareStartTime) {
+        this.prepareStartTime = prepareStartTime;
+    }
+
+    public Date getResponseStartTime() {
+        return responseStartTime;
+    }
+
+    public void setResponseStartTime(Date responseStartTime) {
+        this.responseStartTime = responseStartTime;
+    }
+
+    public Date getRecoveryStartTime() {
+        return recoveryStartTime;
+    }
+
+    public void setRecoveryStartTime(Date recoveryStartTime) {
+        this.recoveryStartTime = recoveryStartTime;
+    }
+
+    public Date getRecoveryEndTime() {
+        return recoveryEndTime;
+    }
+
+    public void setRecoveryEndTime(Date recoveryEndTime) {
+        this.recoveryEndTime = recoveryEndTime;
+    }
+
     public void setSubscibeEventParams(SubscibeEventParams subscibeEventParams) {
         this.subscibeEventParams = subscibeEventParams;
+    }
+
+    public Date getMaxWaterLevelTime() {
+        return maxWaterLevelTime;
+    }
+
+    public void setMaxWaterLevelTime(Date maxWaterLevelTime) {
+        this.maxWaterLevelTime = maxWaterLevelTime;
     }
 }

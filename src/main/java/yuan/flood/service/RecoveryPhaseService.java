@@ -18,6 +18,8 @@ import yuan.flood.sos.Encode;
 import yuan.flood.until.HttpMethods;
 import yuan.flood.until.SOSSESConfig;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 @Service
@@ -53,17 +55,35 @@ public class RecoveryPhaseService implements IRecoveryPhaseService {
             List<DataTimeSeries> dataTimeSeries= decode.decodeObservation(responseXML);
            //寻找最大水位值
             Double maxWaterLevel = -Double.MAX_VALUE;
+            int maxWaterLevelKey = 0;
             for (int i=0;i<dataTimeSeries.size();i++) {
                 Double currentWaterLevel = dataTimeSeries.get(i).getDataValue();
                 if (maxWaterLevel <currentWaterLevel ) {
                     maxWaterLevel = currentWaterLevel;
+                    maxWaterLevelKey = i;
                 }
             }
             statisticFloodResult.setMaxWaterLevel(maxWaterLevel);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+            try {
+                Date maxWaterDate = simpleDateFormat.parse(dataTimeSeries.get(maxWaterLevelKey).getTimeStr());
+                statisticFloodResult.setMaxWaterLevelTime(maxWaterDate);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
         } catch (XmlException e) {
             e.printStackTrace();
         }
+        //赋值
+        statisticFloodResult.setStartTime(object.getStartTime());
+        statisticFloodResult.setEndTime(object.getEndTime());
+        statisticFloodResult.setDiagnosisStartTime(object.getDiagnosisStartTime());
+        statisticFloodResult.setPrepareStartTime(object.getPrepareStartTime());
+        statisticFloodResult.setResponseStartTime(object.getResponseStartTime());
+        statisticFloodResult.setRecoveryStartTime(object.getRecoveryStartTime());
+        statisticFloodResult.setRecoveryEndTime(object.getRecoveryEndTime());
+
         //计算准备阶段时间
         Long prepareTimeLength = fullEvent.getResponseStartTime().getTime() - fullEvent.getPrepareStartTime().getTime();
         Long responnseTimeLength = fullEvent.getRecoveryStartTime().getTime() - fullEvent.getResponseStartTime().getTime();
@@ -72,11 +92,13 @@ public class RecoveryPhaseService implements IRecoveryPhaseService {
         statisticFloodResult.setPrepareDuration(prepareTimeLength);
         statisticFloodResult.setResponseDuration(responnseTimeLength);
         statisticFloodResult.setRecoveryDuration(recoveryTimeLength);
-
+        statisticFloodResult.setStatisticTime(new Date());
         statisticFloodResult.setSubscibeEventParams(subscibeEventParams);
         //设置全事件的关联事件信息，并存储
         object.setEvent(subscibeEventParams);
         detectedFullEventDao.save(object);
+
+        //发送消息，说明事件已经回退到诊断阶段
 
         //存放在数据库中
         statisticFloodDao.save(statisticFloodResult);

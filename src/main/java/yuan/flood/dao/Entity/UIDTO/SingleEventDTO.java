@@ -8,6 +8,7 @@ import java.util.List;
 public class SingleEventDTO {
     private SingleEventSensorDTO dataset;
     private SubscribeEventParamsDTO params;
+    private EventPhaseResultDTO results;
     private List<SensorDTO> sensors;
     private List<EventSensorPropertyDTO> propertys;
 
@@ -41,5 +42,13 @@ public class SingleEventDTO {
 
     public void setPropertys(List<EventSensorPropertyDTO> propertys) {
         this.propertys = propertys;
+    }
+
+    public EventPhaseResultDTO getResults() {
+        return results;
+    }
+
+    public void setResults(EventPhaseResultDTO results) {
+        this.results = results;
     }
 }

@@ -8,17 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import yuan.flood.dao.Entity.ObservedProperty;
-import yuan.flood.dao.Entity.Sensor;
-import yuan.flood.dao.Entity.SubscibeEventParams;
+import yuan.flood.dao.Entity.*;
 import yuan.flood.dao.Entity.UIDTO.*;
-import yuan.flood.dao.Entity.UIEntity.ConvertUtil;
-import yuan.flood.dao.Entity.UIEntity.SensorDTO;
-import yuan.flood.service.IService.IEventService;
-import yuan.flood.service.IService.IPropertyService;
-import yuan.flood.service.IService.ISensorService;
+import yuan.flood.dao.Entity.UIEntity.*;
+import yuan.flood.service.IService.*;
 import yuan.flood.sos.DataTimeSeries;
 import yuan.flood.sos.HighChartsDrawData;
+import yuan.flood.until.FeatureUtil;
 import yuan.flood.until.ReadConfig;
 import yuan.flood.until.SOSSESConfig;
 
@@ -39,26 +35,34 @@ public class SingleEventController {
     private IEventService eventService;
     @Autowired
     private ISensorService sensorService;
+    @Autowired
+    private ISensorObsPropertyService sensorObsPropertyService;
+    @Autowired
+    private IAlertFloodService alertFloodService;
+    @Autowired
+    private IPredictWaterLevelService predictWaterLevelService;
+    @Autowired
+    private IStatisticFloodService statisticFloodService;
 
-    @RequestMapping(value = "/showSingleEventInformation/{eventID}",method = RequestMethod.GET)
-    public String getShowSingleEventInformationPage(@PathVariable String eventID,ModelMap modelMap,HttpServletRequest request){
-        HttpSession session=request.getSession();
+    @RequestMapping(value = "/showSingleEventInformation/{eventID}", method = RequestMethod.GET)
+    public String getShowSingleEventInformationPage(@PathVariable String eventID, ModelMap modelMap, HttpServletRequest request) {
+        HttpSession session = request.getSession();
         session.removeAttribute("eventID");
-        session.setAttribute("eventID",eventID);
-        SubscibeEventParams params= eventService.getRegisteredEventParamsBySesid(eventID);
-        modelMap.addAttribute("eventParams",params);
+        session.setAttribute("eventID", eventID);
+        SubscibeEventParams params = eventService.getRegisteredEventParamsBySesid(eventID);
+        modelMap.addAttribute("eventParams", params);
         return "showSingleEventInformation";
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getEventData",method = RequestMethod.POST)
-    public String getEventDataForPlot(HttpServletRequest request){
-        HttpSession session=request.getSession();
-        String sesID= (String) session.getAttribute("eventID");
-        String series= eventService.getDetectedEventBySESID(SOSSESConfig.getSosurl(), sesID);
+    @RequestMapping(value = "/getEventData", method = RequestMethod.POST)
+    public String getEventDataForPlot(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String sesID = (String) session.getAttribute("eventID");
+        String series = eventService.getDetectedEventBySESID(SOSSESConfig.getSosurl(), sesID);
         //create series json for draw;
         //demo:[{type:'areaspline',data:[29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]," +
-       // "pointStart:1420070400000,pointIntervalUnit:'month',zoneAxis:'x',zones:[{value:1433116800000" +
+        // "pointStart:1420070400000,pointIntervalUnit:'month',zoneAxis:'x',zones:[{value:1433116800000" +
         //       ",color:'#90ed7d'},{value:1435708800000,color:'#f15c80'},{value:1441065600000,color:'#90ed7d'}]}]
 
         return series;
@@ -69,6 +73,7 @@ public class SingleEventController {
 
     /**
      * 获取单个事件的传感器分布信息，以及当前事件选择的属性信息
+     *
      * @param eventID
      * @return
      */
@@ -132,11 +137,11 @@ public class SingleEventController {
         FloodResult<String> floodResult = new FloodResult<>();
         floodResult.setFlag(true);
 
-        if (Strings.isNullOrEmpty(eventID)){
+        if (Strings.isNullOrEmpty(eventID)) {
             floodResult.setFlag(false);
             floodResult.setMessage("eventID不可为空");
         }
-       String series = "[]";
+        String series = "[]";
         try {
             series = eventService.getDetectedDataInJsonBySESID(SOSSESConfig.getSosurl(), eventID);
         } catch (Exception e) {
@@ -164,7 +169,7 @@ public class SingleEventController {
         }
         String res = "";
         try {
-          res= eventService.getSingleDataInJsonByEventSensorProperty(SOSSESConfig.getSosurl(), sesEventID, sensorID, propertyID);
+            res = eventService.getSingleDataInJsonByEventSensorProperty(SOSSESConfig.getSosurl(), sesEventID, sensorID, propertyID);
         } catch (Exception e) {
             floodResult.setFlag(false);
             floodResult.setMessage(e.getMessage());
@@ -177,7 +182,6 @@ public class SingleEventController {
 
         return floodResult;
     }
-
 
 
     /**
@@ -196,7 +200,7 @@ public class SingleEventController {
         }
         //当事件不为空值时，拿到存储的事件信息
         SubscibeEventParams params = eventService.getRegisteredEventParamsByEventSesID(eventSesID);
-        if (params==null){
+        if (params == null) {
             floodResult.setFlag(false);
             floodResult.setMessage("事件ID无效，不存在该事件！");
             return floodResult;
@@ -221,23 +225,23 @@ public class SingleEventController {
             return floodResult;
         }
         //获取不重复的传感器
-        String diagnosissSensorID=params.getDiagnosisSensor();
-        String prepareSensorID=params.getPrepareSensor();
-        String responseSensorID=params.getResponseSensor();
-        String recoverySensorID=params.getRecoverySensor();
-        List<String> differSensors=new ArrayList<String>();
+        String diagnosissSensorID = params.getDiagnosisSensor();
+        String prepareSensorID = params.getPrepareSensor();
+        String responseSensorID = params.getResponseSensor();
+        String recoverySensorID = params.getRecoverySensor();
+        List<String> differSensors = new ArrayList<String>();
         List<SensorDTO> sensorDTOS = new ArrayList<SensorDTO>();
         differSensors.add(diagnosissSensorID);
         sensorDTOS.add(ConvertUtil.getSensorDTOfromSensor(sensorsDiagnosis.get(0)));
-        if (!differSensors.contains(prepareSensorID)){
+        if (!differSensors.contains(prepareSensorID)) {
             differSensors.add(prepareSensorID);
             sensorDTOS.add(ConvertUtil.getSensorDTOfromSensor(sensorsPrepare.get(0)));
         }
-        if (!differSensors.contains(responseSensorID)){
+        if (!differSensors.contains(responseSensorID)) {
             differSensors.add(responseSensorID);
             sensorDTOS.add(ConvertUtil.getSensorDTOfromSensor(sensorsResponse.get(0)));
         }
-        if (!differSensors.contains(recoverySensorID)){
+        if (!differSensors.contains(recoverySensorID)) {
             differSensors.add(recoverySensorID);
             sensorDTOS.add(ConvertUtil.getSensorDTOfromSensor(sensorsRecovery.get(0)));
         }
@@ -246,21 +250,22 @@ public class SingleEventController {
         List<EventSensorPropertyDTO> eventSensorPropertyDTOS = new ArrayList<>();
         sensorAndObsStr.add(diagnosissSensorID + params.getDiagnosisObservation());
         eventSensorPropertyDTOS.add(ConvertUtil.getEventSensorPropertyDTOFromSensorAndProperty(sensorsDiagnosis.get(0), observedPropertyDiag));
-        if (!sensorAndObsStr.contains(prepareSensorID+params.getPrepareObservation())){
+        if (!sensorAndObsStr.contains(prepareSensorID + params.getPrepareObservation())) {
             eventSensorPropertyDTOS.add(ConvertUtil.getEventSensorPropertyDTOFromSensorAndProperty(sensorsPrepare.get(0), observedPropertyPre));
             sensorAndObsStr.add(prepareSensorID + params.getPrepareObservation());
         }
-        if (!sensorAndObsStr.contains(responseSensorID+params.getResponseObservation())){
+        if (!sensorAndObsStr.contains(responseSensorID + params.getResponseObservation())) {
             eventSensorPropertyDTOS.add(ConvertUtil.getEventSensorPropertyDTOFromSensorAndProperty(sensorsResponse.get(0), observedPropertyRes));
             sensorAndObsStr.add(responseSensorID + params.getResponseObservation());
         }
-        if (!sensorAndObsStr.contains(recoverySensorID+params.getRecoveryObservation())){
+        if (!sensorAndObsStr.contains(recoverySensorID + params.getRecoveryObservation())) {
             eventSensorPropertyDTOS.add(ConvertUtil.getEventSensorPropertyDTOFromSensorAndProperty(sensorsRecovery.get(0), observedPropertyRec));
             sensorAndObsStr.add(recoverySensorID + params.getRecoveryObservation());
         }
 
         SingleEventDTO singleEventDTO = new SingleEventDTO();
-        singleEventDTO.setParams(ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(params));
+        SubscribeEventParamsDTO subscribeEventParamsDTO = ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(params);
+        singleEventDTO.setParams(subscribeEventParamsDTO);
 
         SingleEventSensorDTO singleEventSensorDTO = new SingleEventSensorDTO();
         singleEventSensorDTO.setDiagnosisSensor(ConvertUtil.getSensorDTOfromSensor(sensorsDiagnosis.get(0)));
@@ -272,6 +277,59 @@ public class SingleEventController {
         singleEventSensorDTO.setRecoverySensor(ConvertUtil.getSensorDTOfromSensor(sensorsRecovery.get(0)));
         singleEventSensorDTO.setRecoveryProperty(ConvertUtil.getObservedPropertyDTOfromObservedProperty(observedPropertyRec));
 
+        //获取当前的预测的传感器数据
+
+        List<SensorDTO> predictSensors = new ArrayList<>();
+        List<String> ids = subscribeEventParamsDTO.getSensorPropertyIDs();
+        List<String> hasContainedSensorIDs = new ArrayList<>();
+        for (int i = 0; i < ids.size(); i++) {
+            SensorObsProperty sensorObsProperty = sensorObsPropertyService.getSensorPropertyByID(Long.valueOf(ids.get(i)));
+            String currentSensorID = sensorObsProperty.getSensorID();
+            if (!hasContainedSensorIDs.contains(currentSensorID)) {
+                List<Sensor> sensorList = sensorService.findObseredPropertyBySensorID(currentSensorID);
+                if (sensorList != null && sensorList.size() != 0) {
+                    predictSensors.add(ConvertUtil.getSensorDTOfromSensor(sensorList.get(0)));
+                    hasContainedSensorIDs.add(currentSensorID);
+                }
+            }
+        }
+
+        singleEventSensorDTO.setSensors(predictSensors);
+
+        //获取通信记录与预测记录
+        EventPhaseResultDTO eventPhaseResultDTO = new EventPhaseResultDTO();
+        List<AlertFloodResultDTO> alertFloodResultDTOList = new ArrayList<>();
+        List<PredictArrayResultDTO> predictArrayResultDTOList = new ArrayList<>();
+        List<StatisticFloodResultDTO> statisticFloodResultDTOList = new ArrayList<>();
+        List<AlertFloodResult> alertFloodResultList = alertFloodService.findAlertFloodResultByEventID(params.getEventID());
+        List<PredictArrayResult> predictArrayResultList = predictWaterLevelService.getLastPredictWaterLevelResultBySESID(params.getEventID());
+        List<StatisticFloodResult> statisticFloodResultList = statisticFloodService.findStatisticFloodResultByEventId(params.getEventID());
+        if (alertFloodResultList != null)
+            for (int i = 0; i < alertFloodResultList.size(); i++) {
+                AlertFloodResultDTO temp = ConvertUtil.getAlertFloodResultDTOFromAlertFloodResult(alertFloodResultList.get(i));
+                temp.setKey(i + 1);
+                alertFloodResultDTOList.add(temp);
+            }
+
+        if (predictArrayResultList != null)
+            for (int i = 0; i < predictArrayResultList.size(); i++) {
+                PredictArrayResultDTO temp = ConvertUtil.getPredictArrayResultDTOFromPredictArrayResult(predictArrayResultList.get(i));
+                temp.setKey(i + 1);
+                predictArrayResultDTOList.add(temp);
+            }
+
+        if (statisticFloodResultList != null)
+            for (int i = 0; i < statisticFloodResultList.size(); i++) {
+                StatisticFloodResultDTO temp = ConvertUtil.getStatisticFloodResultDTOFromStatisticFloodResult(statisticFloodResultList.get(i));
+                temp.setKey(i + 1);
+                statisticFloodResultDTOList.add(temp);
+            }
+        //根据subscribeparams找到对应的信息内容
+        eventPhaseResultDTO.setAlert(alertFloodResultDTOList);
+        eventPhaseResultDTO.setPredict(predictArrayResultDTOList);
+        eventPhaseResultDTO.setStatistic(statisticFloodResultDTOList);
+
+        singleEventDTO.setResults(eventPhaseResultDTO);
         singleEventDTO.setDataset(singleEventSensorDTO);
         singleEventDTO.setSensors(sensorDTOS);
         singleEventDTO.setPropertys(eventSensorPropertyDTOS);
@@ -284,6 +342,7 @@ public class SingleEventController {
 
     /**
      * 获取服务的地址，及当前事件的状态,以及执行最新的服务
+     *
      * @param eventID
      * @return
      */
@@ -294,14 +353,14 @@ public class SingleEventController {
         FloodResult<String> floodResult = new FloodResult<>();
         floodResult.setFlag(true);
 
-        if (Strings.isNullOrEmpty(eventID)){
+        if (Strings.isNullOrEmpty(eventID)) {
             floodResult.setFlag(false);
             floodResult.setMessage("事件ID不可为空");
             return floodResult;
         }
 
         SubscibeEventParams subscibeEventParams = eventService.getRegisteredEventParamsByEventSesID(eventID);
-        if (subscibeEventParams==null){
+        if (subscibeEventParams == null) {
             floodResult.setFlag(false);
             floodResult.setMessage("无法查找到当前事件");
             return floodResult;
@@ -314,7 +373,7 @@ public class SingleEventController {
 
         if (Strings.isNullOrEmpty(latestType)) {
             floodResult.setObject("无事件状态o ");
-        }else {
+        } else {
             floodResult.setObject(latestType);
         }
         return floodResult;

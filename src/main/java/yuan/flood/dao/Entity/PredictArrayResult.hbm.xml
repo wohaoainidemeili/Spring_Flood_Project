@@ -7,6 +7,7 @@
             <generator class="native"/>
         </id>
         <property name="predictTime" type="java.util.Date" column="predict_time"/>
+        <property name="subject" type="java.lang.String" column="predict_subject"/>
         <property name="timeLonMatrixStr" type="text"  column="predict_time_str"/>
         <property name="predictResultMatrixStr" type="text" column="predict_water_str"></property>
         <property name="trainTargetMatrixStr" type="text" column="real_water_str"></property>

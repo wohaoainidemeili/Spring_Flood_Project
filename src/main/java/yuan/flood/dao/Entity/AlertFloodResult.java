@@ -9,6 +9,7 @@ import java.util.Date;
 public class AlertFloodResult implements Serializable {
     private Long id;
     private Date time;
+    private String subject;
     private String message;
     private SubscibeEventParams subscibeEventParams;
 
@@ -42,5 +43,13 @@ public class AlertFloodResult implements Serializable {
 
     public void setSubscibeEventParams(SubscibeEventParams subscibeEventParams) {
         this.subscibeEventParams = subscibeEventParams;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
     }
 }

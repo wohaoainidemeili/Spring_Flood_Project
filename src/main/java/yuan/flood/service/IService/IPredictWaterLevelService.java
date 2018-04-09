@@ -3,6 +3,8 @@ package yuan.flood.service.IService;
 import yuan.flood.dao.Entity.PredictArrayResult;
 import yuan.flood.dao.Entity.PredictWaterLevelResult;
 
+import java.util.List;
+
 public interface IPredictWaterLevelService {
     void savePredictWaterLevelResult(PredictArrayResult predictWaterLevelResult);
 
@@ -12,6 +14,6 @@ public interface IPredictWaterLevelService {
      * @param sesID
      * @return
      */
-    PredictWaterLevelResult getLastPredictWaterLevelResultBySESID(String sesID);
+    List<PredictArrayResult> getLastPredictWaterLevelResultBySESID(String sesID);
 
 }

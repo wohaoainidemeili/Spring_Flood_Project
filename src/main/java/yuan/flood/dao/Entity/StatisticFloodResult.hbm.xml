@@ -6,8 +6,16 @@
         <id name="id" type="java.lang.Long" column="id">
             <generator class="native"/>
         </id>
+        <property name="startTime" type="java.util.Date" column="startTime"></property>
+        <property name="endTime" type="java.util.Date" column="endTime"></property>
+        <property name="diagnosisStartTime" type="java.util.Date" column="diagnosisStartTime"></property>
+        <property name="prepareStartTime" type="java.util.Date" column="prepareStartTime"></property>
+        <property name="responseStartTime" type="java.util.Date" column="responseStartTime"></property>
+        <property name="recoveryStartTime" type="java.util.Date" column="recoveryStartTime"></property>
+        <property name="recoveryEndTime" type="java.util.Date" column="recoveryEndTime"></property>
         <property name="statisticTime" type="java.util.Date" column="statistic_time"/>
         <property name="maxWaterLevel" type="java.lang.Double"  column="max_waterlevel"/>
+        <property name="maxWaterLevelTime" type="java.util.Date" column="max_waterlevel_time"/>
         <property name="prepareDuration" type="java.lang.Long" column="prepare_duration"/>
         <property name="responseDuration" type="java.lang.Long" column="response_duration"/>
         <property name="recoveryDuration" type="java.lang.Long" column="recovery_duration"/>

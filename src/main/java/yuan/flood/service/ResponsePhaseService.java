@@ -207,6 +207,7 @@ public class ResponsePhaseService implements IResponsePhaseService {
 
         //设置预测的订阅ID
         predictArrayResult.setSubscibeEventParams(subscibeEventParams);
+        predictArrayResult.setSubject("响应阶段");
         //将预测结果存储到数据库中
         predictWaterLevelResultDao.save(predictArrayResult);
 
@@ -230,6 +231,7 @@ public class ResponsePhaseService implements IResponsePhaseService {
             message.append("出现次数达到或超过" + subscibeEventParams.getResponseRepeatTimes() + "次。\r");
             message.append("该水位站点预测水位未来两天结果为" + predictArrayResult.getPredictResultMatrixStr());
             alertFloodResult.setMessage(message.toString());
+            alertFloodResult.setSubject(subscibeEventParams.getUserDefineName() + "事件进入响应阶段");
             //email发送消息内容
             SendMail.send("wenying3413ying@126.com", "dwytam1314", subscibeEventParams.getEmail(), subscibeEventParams.getUserDefineName() + "事件进入响应阶段", message.toString());
         } catch (MessagingException e) {

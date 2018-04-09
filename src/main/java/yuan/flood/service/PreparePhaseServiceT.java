@@ -137,9 +137,9 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
         //运用neuroph工具计算BP神经网络训练
         NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, 7, 10, targetRows);
         BackPropagation backPropagation = new BackPropagation();
-        backPropagation.setLearningRate(0.001);
-        backPropagation.setMaxIterations(50000);
-        backPropagation.setMaxError(0.000000000001);
+        backPropagation.setLearningRate(subscibeEventParams.getLearningRate());
+        backPropagation.setMaxIterations(subscibeEventParams.getMaxIterations());
+        backPropagation.setMaxError(subscibeEventParams.getMaxError());
         DataSet trainDataSet = new DataSet(trainRows, 1);
         for (int l = 0; l < pn[0].length; l++) {
             double[] input = new double[trainRows];
@@ -207,6 +207,7 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
 
         //设置预测的订阅ID
         predictArrayResult.setSubscibeEventParams(subscibeEventParams);
+        predictArrayResult.setSubject("准备阶段");
         //将预测结果存储到数据库中
         predictWaterLevelResultDao.save(predictArrayResult);
 
@@ -230,6 +231,7 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
             message.append("出现次数达到或超过" + subscibeEventParams.getPrepareRepeatTimes() + "次。\r\n");
             message.append("该水位站点预测水位未来两天结果为" + predictArrayResult.getPredictResultMatrixStr());
             alertFloodResult.setMessage(message.toString());
+            alertFloodResult.setSubject(subscibeEventParams.getUserDefineName() + "事件进入准备阶段");
             //email发送消息内容
             SendMail.send("wenying3413ying@126.com", "dwytam1314", subscibeEventParams.getEmail(), subscibeEventParams.getUserDefineName() + "事件进入准备阶段", message.toString());
         } catch (MessagingException e) {

@@ -7,6 +7,7 @@
             <generator class="native"/>
         </id>
         <property name="time" type="java.util.Date" column="alert_time"/>
+        <property name="subject" type="java.lang.String" column="subject"/>
         <property name="message" type="text"  column="message"/>
         <many-to-one name="subscibeEventParams" lazy="false" class="SubscibeEventParams" cascade="save-update" column="ses_id"></many-to-one>
     </class>
