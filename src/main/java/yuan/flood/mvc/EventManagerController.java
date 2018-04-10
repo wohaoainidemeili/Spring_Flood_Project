@@ -101,7 +101,7 @@ public class EventManagerController {
                 return floodResult;
             }
             for (int i = 0; i < eventParams.size(); i++) {
-                subscribeEventParamsDTOS.add(ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(eventParams.get(0)));
+                subscribeEventParamsDTOS.add(ConvertUtil.getSubscribeEventParamsDTOfromSubscibeEventParams(eventParams.get(i)));
             }
         } catch (Exception e) {
             floodResult.setFlag(false);

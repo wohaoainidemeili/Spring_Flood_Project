@@ -46,8 +46,8 @@ public class DecodeWNSEventService implements IDecodeWNSEventService {
     public static Map<String, String> currentEventType = new HashMap<>();
     public static Map<String, DetectedFullEvent> lastestFullEvent = new HashMap<>();
     private ExecutorService executorService = Executors.newFixedThreadPool(4);
-    private ScheduledExecutorService prepareExecutorService = Executors.newScheduledThreadPool(1);
-    private ScheduledExecutorService responseExecutorService = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService prepareExecutorService = Executors.newScheduledThreadPool(4);
+    private ScheduledExecutorService responseExecutorService = Executors.newScheduledThreadPool(4);
 
     @Autowired
     private IDiagnosisPhaserService diagnosisPhaserService;
@@ -258,6 +258,15 @@ public class DecodeWNSEventService implements IDecodeWNSEventService {
         if (Strings.isNullOrEmpty(lastEventType)) {
             detectedFullEvent = new DetectedFullEvent();
             setDetectedFullEvent(detectedFullEvent, eventType, time, lastEventType);
+            detectedFullEvent.setStartTime(time);
+            lastestFullEvent.put(sesID, detectedFullEvent);
+            return;
+        }
+        //主要有准备阶段的状态，就进行更新
+        if (DIAGNOSIS_TYPE.equals(eventType)&&!lastEventType.equals(RECOVERY_TYPE)){
+            detectedFullEvent = lastestFullEvent.get(sesID);
+            if (detectedFullEvent==null) detectedFullEvent = new DetectedFullEvent();
+            detectedFullEvent.setDiagnosisStartTime(time);
             detectedFullEvent.setStartTime(time);
             lastestFullEvent.put(sesID, detectedFullEvent);
             return;

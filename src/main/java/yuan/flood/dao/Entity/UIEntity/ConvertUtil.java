@@ -190,7 +190,7 @@ public class ConvertUtil {
 
     public static AlertFloodResultDTO getAlertFloodResultDTOFromAlertFloodResult(AlertFloodResult alertFloodResult) {
         AlertFloodResultDTO alertFloodResultDTO = new AlertFloodResultDTO();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         String date = simpleDateFormat.format(alertFloodResult.getTime());
         alertFloodResultDTO.setTime(date);
         alertFloodResultDTO.setSubject(alertFloodResult.getSubject());
@@ -200,7 +200,7 @@ public class ConvertUtil {
 
     public static PredictArrayResultDTO getPredictArrayResultDTOFromPredictArrayResult(PredictArrayResult predictArrayResult) {
         PredictArrayResultDTO predictArrayResultDTO = new PredictArrayResultDTO();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         String date= simpleDateFormat.format(predictArrayResult.getPredictTime());
         predictArrayResultDTO.setPredictTime(date);
         predictArrayResultDTO.setSubject(predictArrayResult.getSubject());
@@ -232,6 +232,9 @@ public class ConvertUtil {
         //形成highcharts的JSON数据
         StringBuffer buffer = new StringBuffer();
         buffer.append("{");
+        buffer.append("title: {");
+        buffer.append("text: '洪涝过程统计模型传感器水位预测结果图'");
+        buffer.append("},");
         buffer.append("legend: {");
         buffer.append("layout: 'vertical',");
         buffer.append("floating: true,");
@@ -320,7 +323,7 @@ public class ConvertUtil {
 
     public static StatisticFloodResultDTO getStatisticFloodResultDTOFromStatisticFloodResult(StatisticFloodResult statisticFloodResult) {
         StatisticFloodResultDTO statisticFloodResultDTO = new StatisticFloodResultDTO();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
         String startTime = simpleDateFormat.format(statisticFloodResult.getStartTime());
         String endTime = simpleDateFormat.format(statisticFloodResult.getEndTime());
@@ -343,9 +346,9 @@ public class ConvertUtil {
         statisticFloodResultDTO.setMaxWaterLevel(statisticFloodResult.getMaxWaterLevel());
         statisticFloodResultDTO.setMaxWaterLevelTime(maxWaterLevelTime);
         statisticFloodResultDTO.setStatisticTime(statisticTime);
-        statisticFloodResultDTO.setPrepareDuration(statisticFloodResult.getPrepareDuration());
-        statisticFloodResultDTO.setResponseDuration(statisticFloodResult.getResponseDuration());
-        statisticFloodResultDTO.setRecoveryDuration(statisticFloodResult.getRecoveryDuration());
+        statisticFloodResultDTO.setPrepareDuration(statisticFloodResult.getPrepareDuration()/3600000);
+        statisticFloodResultDTO.setResponseDuration(statisticFloodResult.getResponseDuration()/3600000);
+        statisticFloodResultDTO.setRecoveryDuration(statisticFloodResult.getRecoveryDuration()/3600000);
         return statisticFloodResultDTO;
     }
 }

@@ -21,6 +21,7 @@ import yuan.flood.until.SOSSESConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -281,17 +282,29 @@ public class SingleEventController {
 
         List<SensorDTO> predictSensors = new ArrayList<>();
         List<String> ids = subscribeEventParamsDTO.getSensorPropertyIDs();
-        List<String> hasContainedSensorIDs = new ArrayList<>();
+
+        Map<String, List<ObservedPropertyDTO>> sensorPropertiesMap = new HashMap<>();
         for (int i = 0; i < ids.size(); i++) {
             SensorObsProperty sensorObsProperty = sensorObsPropertyService.getSensorPropertyByID(Long.valueOf(ids.get(i)));
             String currentSensorID = sensorObsProperty.getSensorID();
-            if (!hasContainedSensorIDs.contains(currentSensorID)) {
-                List<Sensor> sensorList = sensorService.findObseredPropertyBySensorID(currentSensorID);
-                if (sensorList != null && sensorList.size() != 0) {
-                    predictSensors.add(ConvertUtil.getSensorDTOfromSensor(sensorList.get(0)));
-                    hasContainedSensorIDs.add(currentSensorID);
-                }
+            ObservedPropertyDTO observedPropertyDTO = new ObservedPropertyDTO();
+            observedPropertyDTO.setPropertyID(sensorObsProperty.getObservedPropertyID());
+            observedPropertyDTO.setPropertyName(sensorObsProperty.getPropertyName());
+
+            List<ObservedPropertyDTO> propertyDTOS = sensorPropertiesMap.get(currentSensorID);
+            if (propertyDTOS==null){
+                propertyDTOS = new ArrayList<>();;
             }
+            propertyDTOS.add(observedPropertyDTO);
+            sensorPropertiesMap.put(currentSensorID, propertyDTOS);
+
+        }
+        for (Map.Entry entry : sensorPropertiesMap.entrySet()) {
+            String sensorID = (String) entry.getKey();
+            List<Sensor> sensors = sensorService.findObseredPropertyBySensorID(sensorID);
+            SensorDTO sensorDTOfromSensor = ConvertUtil.getSensorDTOfromSensor(sensors.get(0));
+            sensorDTOfromSensor.setObservedProperties((List<ObservedPropertyDTO>) entry.getValue());
+            predictSensors.add(sensorDTOfromSensor);
         }
 
         singleEventSensorDTO.setSensors(predictSensors);

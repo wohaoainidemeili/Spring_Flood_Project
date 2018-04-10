@@ -3,9 +3,15 @@ package yuan.flood.mvc;
 import yuan.flood.dao.Entity.PredictWaterLevelResult;
 import yuan.flood.phase.function.Normalization;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class DoubleTest {
     public static void main(String[] args) {
 
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        String test = simpleDateFormat.format(new Date());
+        System.out.println(test);
 
         for (int i=0;i<3;i++) {
             double[][] testDouble = new double[2][2];

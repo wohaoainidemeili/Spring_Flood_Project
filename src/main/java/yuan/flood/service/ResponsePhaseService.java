@@ -133,9 +133,10 @@ public class ResponsePhaseService implements IResponsePhaseService {
         double[][] pn = getNormalizationMatrix(trainDataMatrix, outMaxP, outMinP);
         double[][] tn = getNormalizationMatrix(targetDataMatrix, outMaxT, outMinT);
 
-
+        int firstLayerNum = (int)Math.floor(Math.sqrt(trainRows + targetRows));
+        int secondLayerNum = firstLayerNum + 3;
         //运用neuroph工具计算BP神经网络训练
-        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, 7, 10, targetRows);
+        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, firstLayerNum, secondLayerNum, targetRows);
         BackPropagation backPropagation = new BackPropagation();
         backPropagation.setLearningRate(0.001);
         backPropagation.setMaxIterations(50000);

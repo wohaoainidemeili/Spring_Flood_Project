@@ -134,8 +134,10 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
         double[][] tn = getNormalizationMatrix(targetDataMatrix, outMaxT, outMinT);
 
 
+        int firstLayerNum = (int)Math.floor(Math.sqrt(trainRows + targetRows));
+        int secondLayerNum = firstLayerNum + 3;
         //运用neuroph工具计算BP神经网络训练
-        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, 7, 10, targetRows);
+        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, firstLayerNum, secondLayerNum, targetRows);
         BackPropagation backPropagation = new BackPropagation();
         backPropagation.setLearningRate(subscibeEventParams.getLearningRate());
         backPropagation.setMaxIterations(subscibeEventParams.getMaxIterations());
