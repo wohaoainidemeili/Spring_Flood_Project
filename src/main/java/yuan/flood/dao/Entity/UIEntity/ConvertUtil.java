@@ -6,6 +6,8 @@ import yuan.flood.dao.Entity.UIDTO.EventSensorPropertyDTO;
 import yuan.flood.dao.Entity.UIDTO.SubscribeParamsDTO;
 import yuan.flood.until.FeatureUtil;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -346,9 +348,13 @@ public class ConvertUtil {
         statisticFloodResultDTO.setMaxWaterLevel(statisticFloodResult.getMaxWaterLevel());
         statisticFloodResultDTO.setMaxWaterLevelTime(maxWaterLevelTime);
         statisticFloodResultDTO.setStatisticTime(statisticTime);
-        statisticFloodResultDTO.setPrepareDuration(statisticFloodResult.getPrepareDuration()/3600000);
-        statisticFloodResultDTO.setResponseDuration(statisticFloodResult.getResponseDuration()/3600000);
-        statisticFloodResultDTO.setRecoveryDuration(statisticFloodResult.getRecoveryDuration()/3600000);
+        double prepareHour = new BigDecimal(statisticFloodResult.getPrepareDuration() * 1.0 / 3600000).setScale(3,RoundingMode.UP).doubleValue();
+        double responseHour = new BigDecimal(statisticFloodResult.getResponseDuration() * 1.0 / 3600000).setScale(3, RoundingMode.UP).doubleValue();
+        double recovery = new BigDecimal(statisticFloodResult.getRecoveryDuration() * 1.0 / 3600000).setScale(3, RoundingMode.UP).doubleValue();
+        statisticFloodResultDTO.setPrepareDuration(prepareHour);
+        statisticFloodResultDTO.setResponseDuration(responseHour);
+        statisticFloodResultDTO.setRecoveryDuration(recovery);
+
         return statisticFloodResultDTO;
     }
 }

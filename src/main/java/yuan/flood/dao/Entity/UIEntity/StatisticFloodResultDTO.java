@@ -15,9 +15,9 @@ public class StatisticFloodResultDTO {
     private String statisticTime;
     private Double maxWaterLevel;
     private String maxWaterLevelTime;
-    private Long prepareDuration;
-    private Long responseDuration;
-    private Long recoveryDuration;
+    private Double prepareDuration;
+    private Double responseDuration;
+    private Double recoveryDuration;
 
     public int getKey() {
         return key;
@@ -107,27 +107,27 @@ public class StatisticFloodResultDTO {
         this.maxWaterLevelTime = maxWaterLevelTime;
     }
 
-    public Long getPrepareDuration() {
+    public Double getPrepareDuration() {
         return prepareDuration;
     }
 
-    public void setPrepareDuration(Long prepareDuration) {
+    public void setPrepareDuration(Double prepareDuration) {
         this.prepareDuration = prepareDuration;
     }
 
-    public Long getResponseDuration() {
+    public Double getResponseDuration() {
         return responseDuration;
     }
 
-    public void setResponseDuration(Long responseDuration) {
+    public void setResponseDuration(Double responseDuration) {
         this.responseDuration = responseDuration;
     }
 
-    public Long getRecoveryDuration() {
+    public Double getRecoveryDuration() {
         return recoveryDuration;
     }
 
-    public void setRecoveryDuration(Long recoveryDuration) {
+    public void setRecoveryDuration(Double recoveryDuration) {
         this.recoveryDuration = recoveryDuration;
     }
 }

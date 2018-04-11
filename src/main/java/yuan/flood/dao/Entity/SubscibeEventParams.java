@@ -476,7 +476,7 @@ public class SubscibeEventParams {
         this.featureString = featureString;
     }
 
-    public double getLearningRate() {
+    public Double getLearningRate() {
         return learningRate;
     }
 
@@ -492,7 +492,7 @@ public class SubscibeEventParams {
         this.maxIterations = maxIterations;
     }
 
-    public double getMaxError() {
+    public Double getMaxError() {
         return maxError;
     }
 

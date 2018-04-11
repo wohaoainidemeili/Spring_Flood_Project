@@ -66,7 +66,7 @@ public class RecoveryPhaseService implements IRecoveryPhaseService {
             statisticFloodResult.setMaxWaterLevel(maxWaterLevel);
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
             try {
-                Date maxWaterDate = simpleDateFormat.parse(dataTimeSeries.get(maxWaterLevelKey).getTimeStr());
+                Date maxWaterDate = simpleDateFormat.parse(dataTimeSeries.get(maxWaterLevelKey).getTimeStr().replace("+08:00", "+0800"));
                 statisticFloodResult.setMaxWaterLevelTime(maxWaterDate);
             } catch (ParseException e) {
                 e.printStackTrace();

@@ -4,6 +4,7 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
+import yuan.flood.dao.Entity.Sensor;
 import yuan.flood.dao.IDao.IBaseStringIDDao;
 
 import java.io.Serializable;
@@ -65,6 +66,7 @@ public class BaseStringIDDaoImpl<T,PK> extends HibernateDaoSupport implements IB
 
     @Override
     public void saveOrUpdate(T entity) {
+        getHibernateTemplate().clear();
         getHibernateTemplate().saveOrUpdate(entity);
     }
 

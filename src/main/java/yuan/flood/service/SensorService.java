@@ -74,14 +74,15 @@ public class SensorService implements ISensorService {
 
         try {
             for (Sensor sensor:sensors) {
-                if (isSavedProperty(sensor,hasSavedPropertyID))
-                    sensorDao.merge(sensor);
-                else {
-                    sensorDao.saveOrUpdate(sensor);
-                    for (ObservedProperty observedProperty : sensor.getObservedProperties()) {
-                        hasSavedPropertyID.add(observedProperty.getPropertyID());
-                    }
-                }
+//                if (isSavedProperty(sensor,hasSavedPropertyID))
+//                    sensorDao.merge(sensor);
+//                else {
+//                    sensorDao.saveOrUpdate(sensor);
+//                    for (ObservedProperty observedProperty : sensor.getObservedProperties()) {
+//                        hasSavedPropertyID.add(observedProperty.getPropertyID());
+//                    }
+//                }
+                sensorDao.saveOrUpdate(sensor);
             }
 
             //存储中间表，获得每个传感器的所有属性

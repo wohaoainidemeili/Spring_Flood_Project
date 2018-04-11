@@ -468,7 +468,7 @@ public class SubscribeEventParamsDTO {
         this.featureMap = featureMap;
     }
 
-    public double getLearningRate() {
+    public Double getLearningRate() {
         return learningRate;
     }
 
@@ -484,7 +484,7 @@ public class SubscribeEventParamsDTO {
         this.maxIterations = maxIterations;
     }
 
-    public double getMaxError() {
+    public Double getMaxError() {
         return maxError;
     }
 
