@@ -32,7 +32,7 @@ import javax.mail.MessagingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@Service
+@Service("preparePhaseServiceT")
 public class PreparePhaseServiceT implements IPreparePhaseServiceT {
     @Autowired
     IEventService eventService;
@@ -73,7 +73,8 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
 //        Date now = new Date();
         Date now = new Date();
         //当前时间前七分钟时间
-        Date before = new Date(now.getTime() - 1000 * 15 * 60);
+        Integer trainLength = SOSSESConfig.getPredictrainlength();
+        Date before = new Date(now.getTime() - 1000 * trainLength * 60);
         List<String> sensorNameList = new ArrayList<>();
         List<String> propertyNameList = new ArrayList<>();
         for (int i = 0; i < listFromString.size(); i++) {
@@ -87,7 +88,7 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
             try {
                 List<DataTimeSeries> dataTimeSeries = decode.decodeObservation(responseXML);
                 //数据长度小于100，消除该数据
-                if (dataTimeSeries.size() < 5) continue;
+                if (dataTimeSeries.size() < listFromString.size()) continue;
                 Collections.sort(dataTimeSeries);
 
                 usefulProperties.add(sensorObsProperty);
@@ -107,7 +108,7 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
         String targetResponseXML = methods.sendPost(SOSSESConfig.getSosurl(), targetObservationXML);
         try {
             targetDataTimeSeries = decode.decodeObservation(targetResponseXML);
-            if (targetDataTimeSeries.size() < 5) try {
+            if (targetDataTimeSeries.size() < listFromString.size()) try {
                 throw new Exception("水位数据数量无法达到训练要求");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -137,7 +138,7 @@ public class PreparePhaseServiceT implements IPreparePhaseServiceT {
         int firstLayerNum = (int)Math.floor(Math.sqrt(trainRows + targetRows));
         int secondLayerNum = firstLayerNum + 3;
         //运用neuroph工具计算BP神经网络训练
-        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, firstLayerNum, secondLayerNum, targetRows);
+        NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.TANH, trainRows, firstLayerNum, secondLayerNum, targetRows);
         BackPropagation backPropagation = new BackPropagation();
         backPropagation.setLearningRate(subscibeEventParams.getLearningRate());
         backPropagation.setMaxIterations(subscibeEventParams.getMaxIterations());

@@ -16,7 +16,7 @@ public class AlertFloodService implements IAlertFloodService{
     @Override
     public List<AlertFloodResult> findAlertFloodResultByEventID(String eventID) {
         String countHql = "select count(*) from AlertFloodResult p";
-        String predictFindHql = "from AlertFloodResult p where p.subscibeEventParams.eventID='" + eventID + "'";
+        String predictFindHql = "from AlertFloodResult p where p.subscibeEventParams.eventID='" + eventID + "' order by p.time";
         List<Long> countList = alertFloodDao.find(countHql);
         if (countList.get(0)==0) return null;
         List<AlertFloodResult> alertFloodResultList = alertFloodDao.find(predictFindHql);

@@ -3,21 +3,25 @@ package yuan.flood.service;
 import org.apache.xmlbeans.XmlException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import yuan.flood.dao.Entity.AlertFloodResult;
 import yuan.flood.dao.Entity.DetectedFullEvent;
 import yuan.flood.dao.Entity.StatisticFloodResult;
 import yuan.flood.dao.Entity.SubscibeEventParams;
+import yuan.flood.dao.IDao.IAlertFloodDao;
 import yuan.flood.dao.IDao.IDetectedFullEventDao;
 import yuan.flood.dao.IDao.IStatisticFloodDao;
 import yuan.flood.service.IService.IEventService;
 import yuan.flood.service.IService.IPhaseService;
 import yuan.flood.service.IService.IRecoveryPhaseService;
 import yuan.flood.service.IService.ISensorService;
+import yuan.flood.service.function.SendMail;
 import yuan.flood.sos.DataTimeSeries;
 import yuan.flood.sos.Decode;
 import yuan.flood.sos.Encode;
 import yuan.flood.until.HttpMethods;
 import yuan.flood.until.SOSSESConfig;
 
+import javax.mail.MessagingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,6 +42,8 @@ public class RecoveryPhaseService implements IRecoveryPhaseService {
     private IStatisticFloodDao statisticFloodDao;
     @Autowired
     private IDetectedFullEventDao detectedFullEventDao;
+    @Autowired
+    private IAlertFloodDao alertFloodDao;
     @Override
     public void executeService(String sesID, Date date,DetectedFullEvent object) {
         //获取sesID
@@ -99,6 +105,25 @@ public class RecoveryPhaseService implements IRecoveryPhaseService {
         detectedFullEventDao.save(object);
 
         //发送消息，说明事件已经回退到诊断阶段
+        AlertFloodResult alertFloodResult = new AlertFloodResult();
+        alertFloodResult.setTime(new Date());
+        alertFloodResult.setSubscibeEventParams(subscibeEventParams);
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+        String dateStr = simpleDateFormat.format(date);
+        try {
+            //create message
+            StringBuffer message = new StringBuffer();
+            message.append("您订阅的事件\"" + subscibeEventParams.getUserDefineName() + "\"于" + dateStr + "水位恢复至正常。\r\n");
+            alertFloodResult.setSubject(subscibeEventParams.getUserDefineName() + "事件水位恢复至正常");
+            //email发送消息内容
+            SendMail.send("wenying3413ying@126.com", "dwytam1314", subscibeEventParams.getEmail(), subscibeEventParams.getUserDefineName() + "事件水位恢复至正常", message.toString());
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+
+        //发送完数据，将信息写入
+        alertFloodDao.save(alertFloodResult);
 
         //存放在数据库中
         statisticFloodDao.save(statisticFloodResult);

@@ -73,7 +73,8 @@ public class ResponsePhaseService implements IResponsePhaseService {
 //        Date now = new Date();
         Date now = new Date();
         //当前时间前七分钟时间
-        Date before = new Date(now.getTime() - 1000 * 15 * 60);
+        Integer trainLength = SOSSESConfig.getPredictrainlength();
+        Date before = new Date(now.getTime() - 1000 * trainLength * 60);
         List<String> sensorNameList = new ArrayList<>();
         List<String> propertyNameList = new ArrayList<>();
         for (int i = 0; i < listFromString.size(); i++) {
@@ -87,7 +88,7 @@ public class ResponsePhaseService implements IResponsePhaseService {
             try {
                 List<DataTimeSeries> dataTimeSeries = decode.decodeObservation(responseXML);
                 //数据长度小于100，消除该数据
-                if (dataTimeSeries.size() < 5) continue;
+                if (dataTimeSeries.size() < listFromString.size()) continue;
                 Collections.sort(dataTimeSeries);
 
                 usefulProperties.add(sensorObsProperty);
@@ -107,7 +108,7 @@ public class ResponsePhaseService implements IResponsePhaseService {
         String targetResponseXML = methods.sendPost(SOSSESConfig.getSosurl(), targetObservationXML);
         try {
             targetDataTimeSeries = decode.decodeObservation(targetResponseXML);
-            if (targetDataTimeSeries.size() < 5) try {
+            if (targetDataTimeSeries.size() < listFromString.size()) try {
                 throw new Exception("水位数据数量无法达到训练要求");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -138,9 +139,9 @@ public class ResponsePhaseService implements IResponsePhaseService {
         //运用neuroph工具计算BP神经网络训练
         NeuralNetwork neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.SIGMOID, trainRows, firstLayerNum, secondLayerNum, targetRows);
         BackPropagation backPropagation = new BackPropagation();
-        backPropagation.setLearningRate(0.001);
-        backPropagation.setMaxIterations(50000);
-        backPropagation.setMaxError(0.000000000001);
+        backPropagation.setLearningRate(subscibeEventParams.getLearningRate());
+        backPropagation.setMaxIterations(subscibeEventParams.getMaxIterations());
+        backPropagation.setMaxError(subscibeEventParams.getMaxError());
         DataSet trainDataSet = new DataSet(trainRows, 1);
         for (int l = 0; l < pn[0].length; l++) {
             double[] input = new double[trainRows];
@@ -214,7 +215,7 @@ public class ResponsePhaseService implements IResponsePhaseService {
 
         //生成预警消息内容，并将预警消息存储到数据库中
         AlertFloodResult alertFloodResult = new AlertFloodResult();
-        alertFloodResult.setTime(date);
+        alertFloodResult.setTime(new Date());
         alertFloodResult.setSubscibeEventParams(subscibeEventParams);
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");

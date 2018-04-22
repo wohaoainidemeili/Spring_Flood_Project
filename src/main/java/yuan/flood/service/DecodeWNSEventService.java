@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.w3.x2003.x05.soapEnvelope.Body;
 import org.w3.x2003.x05.soapEnvelope.Envelope;
@@ -49,9 +50,16 @@ public class DecodeWNSEventService implements IDecodeWNSEventService {
     private ScheduledExecutorService prepareExecutorService = Executors.newScheduledThreadPool(4);
     private ScheduledExecutorService responseExecutorService = Executors.newScheduledThreadPool(4);
 
+    //用于构建定时任务线程，预测与发送
+    private Map<String, ScheduledExecutorService> predictThreadPoolMap = new HashMap<>();
+
+    //用于构建单任务线程，主要是预警、通知与统计
+    private Map<String, ExecutorService> executorServiceMap = new HashMap<>();
+
     @Autowired
     private IDiagnosisPhaserService diagnosisPhaserService;
     @Autowired
+    @Qualifier("preparePhaseServiceT")
     private IPreparePhaseServiceT preparePhaseServiceT;
     @Autowired
     private IResponsePhaseService responsePhaseService;

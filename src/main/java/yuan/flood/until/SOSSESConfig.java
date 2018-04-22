@@ -19,6 +19,7 @@ public class SOSSESConfig {
     String responseServiceClass = "responseService";
     String recoveryServiceClass = "recoveryService";
     String exexcutorServiceTimePeriod = "serviceTimePeriod";
+    String predictTrainLength="predictTrainLength";
 
 
     static String sosurl;
@@ -34,6 +35,7 @@ public class SOSSESConfig {
     static String responseserviceclass;
     static String recoveryserviceclass;
     static long exexcutorservicetimeperiod;
+    static Integer predictrainlength;
 
     public SOSSESConfig(Properties properties){
         setSosurl(properties.getProperty(sosUrl));
@@ -51,6 +53,8 @@ public class SOSSESConfig {
         setRecoveryserviceclass(properties.getProperty(recoveryServiceClass));
 
         setExexcutorservicetimeperiod(Long.valueOf(properties.getProperty(exexcutorServiceTimePeriod)));
+        setPredictrainlength(Integer.valueOf(properties.getProperty(predictTrainLength)));
+
     }
 
     public static String getSosurl() {
@@ -155,5 +159,13 @@ public class SOSSESConfig {
 
     public static void setExexcutorservicetimeperiod(long exexcutorservicetimeperiod) {
         SOSSESConfig.exexcutorservicetimeperiod = exexcutorservicetimeperiod;
+    }
+
+    public static Integer getPredictrainlength() {
+        return predictrainlength;
+    }
+
+    public static void setPredictrainlength(Integer predictrainlength) {
+        SOSSESConfig.predictrainlength = predictrainlength;
     }
 }

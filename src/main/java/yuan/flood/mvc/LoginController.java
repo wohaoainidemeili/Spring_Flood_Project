@@ -138,4 +138,38 @@ public class LoginController {
 
 		return floodResult;
 	}
+
+	/**
+	 * 用户注册操作，完成注册
+	 * @param user
+	 * @param request
+	 * @return
+	 */
+	@CrossOrigin(value = "*")
+	@RequestMapping(value = "/register",method = RequestMethod.POST)
+	@ResponseBody
+	public FloodResult<Boolean> registerUser(@RequestBody User user, HttpServletRequest request) {
+		FloodResult<Boolean> floodResult = new FloodResult<>();
+		floodResult.setFlag(true);
+		if (user==null||user.getUserID()==null){
+			floodResult.setFlag(false);
+			floodResult.setMessage("错误的用户注册信息");
+			return floodResult;
+		}
+
+		//确定当前用户ID是否已经注册
+		User repeatUser = userService.getUser(user.getUserID());
+		if (repeatUser!=null){
+			floodResult.setFlag(false);
+			floodResult.setMessage("该用户名已注册！");
+			return floodResult;
+		}
+
+		//注册用户
+		userService.saveUser(user);
+
+		floodResult.setObject(true);
+		return floodResult;
+
+	}
 }

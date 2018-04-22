@@ -10,7 +10,7 @@ public class PhaseFactory {
     public final static String RECOVERY_MESSAGE = "recovery";
 
    public static IPhaseService createPhaseService(String messageType){
-       IPhaseService phaseService = null;
+       AbastractPhaseService phaseService = null;
        String classPath;
        switch (messageType) {
            case DIAGNOSIS_MESSAGE:
@@ -40,7 +40,8 @@ public class PhaseFactory {
        Class currentClass = null;
        try {
            currentClass = Class.forName(classPath);
-           phaseService = (IPhaseService) currentClass.newInstance();
+            phaseService = (AbastractPhaseService) currentClass.newInstance();
+            //设置服务初始化，得到所有的服务内容
        } catch (InstantiationException e) {
            e.printStackTrace();
        } catch (IllegalAccessException e) {
